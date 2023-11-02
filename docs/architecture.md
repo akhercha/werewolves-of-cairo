@@ -21,43 +21,43 @@ Doesn't include any specific things related to blockchains/dojo for now (e.g. pl
 
 ```mermaid
 graph LR
-  subgraph "Lobby Model"
-    Lobby["Lobby 
-    -------
-    - ID
-    - Creator Player ID
-    - Status
-    - Player List"]
-  end
   subgraph "Player Model"
     Player["Player 
     -------
-    - ID
+    - Player ID
     - Status
     - Lobby ID
+    - Game ID
     - Role
     - Alive Status
     - Vote"]
   end
+  subgraph "Lobby Model"
+    Lobby["Lobby 
+    -------
+    - Lobby ID
+    - Creator Player ID
+    - Status
+    - Player List"]
+  end
   subgraph "Game Model"
     Game["Game 
     -------
-    - ID
+    - Game ID
     - Lobby ID
     - Status
-    - Current Day"]
+    - Current Day ID"]
   end
   subgraph "Day Model"
     Day["Day 
     -------
-    - ID
+    - Day ID
     - Game ID
     - Status
-    - Number
     - Events"]
   end
-  Lobby --> Player
-  Player --> Game
+  Player --> Lobby
+  Lobby --> Game
   Game --> Day
   Day -.-> Day[Next Day]
 ```
