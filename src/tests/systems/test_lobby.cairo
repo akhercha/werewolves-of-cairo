@@ -16,6 +16,8 @@ use werewolves_of_cairo::systems::lobby::{
 //                           Tests implementation
 // *************************************************************************
 
+// create_lobby()
+
 #[test]
 #[available_gas(300000000)]
 fn test_create_lobby() {
@@ -54,6 +56,8 @@ fn test_create_lobby_invalid_name_too_long() {
     let lobby_name: felt252 = 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa';
     lobby_system.create_lobby(lobby_name);
 }
+
+// join_lobby()
 
 #[test]
 #[available_gas(300000000)]
@@ -166,6 +170,81 @@ fn test_join_lobby_full() {
         new_player += 1;
     };
 }
+
+// leave_lobby()
+
+#[test]
+#[available_gas(300000000)]
+fn test_leave_lobby() {
+    let (creator_address, world, lobby_system) = setup();
+
+    // Create a lobby
+    testing::set_contract_address(creator_address);
+    let (lobby_id, _) = lobby_system.create_lobby('lobby');
+
+    // New player joins lobby
+    let new_player: ContractAddress = contract_address_const::<'satoshi'>();
+    testing::set_contract_address(new_player);
+    lobby_system.join_lobby(lobby_id);
+
+    // & then leaves lobby
+    lobby_system.leave_lobby(lobby_id);
+
+    // Check lobby new world state
+    let lobby: Lobby = get!(world, lobby_id, Lobby);
+    assert(lobby.waiter_next_id == 2, 'should be 2');
+    assert(lobby.num_players == 1, 'should be 1');
+
+    // Check waiter state
+    let waiter = get!(world, (lobby_id, 1), Waiter);
+    assert(waiter.lobby_id == lobby_id, 'should be lobby_id');
+    assert(waiter.waiter_id == new_player, 'should be new player');
+    assert(waiter.has_left_lobby == true, 'should have leave lobby');
+}
+
+#[test]
+#[available_gas(300000000)]
+#[should_panic(expected: ('lobby doesnt exists', 'ENTRYPOINT_FAILED'))]
+fn test_leave_lobby_does_not_exists() {
+    let (creator_address, world, lobby_system) = setup();
+
+    // New player tries to leave a fantom lobby
+    let new_player: ContractAddress = contract_address_const::<'satoshi'>();
+    testing::set_contract_address(new_player);
+    lobby_system.leave_lobby(34567);
+}
+
+#[test]
+#[available_gas(300000000)]
+#[should_panic(expected: ('creator cant leave lobby', 'ENTRYPOINT_FAILED'))]
+fn test_leave_lobby_creator() {
+    let (creator_address, world, lobby_system) = setup();
+
+    // Create a lobby
+    testing::set_contract_address(creator_address);
+    let (lobby_id, _) = lobby_system.create_lobby('lobby');
+
+    // and try to leave it...
+    lobby_system.leave_lobby(lobby_id);
+}
+
+#[test]
+#[available_gas(300000000)]
+#[should_panic(expected: ('caller not in lobby', 'ENTRYPOINT_FAILED'))]
+fn test_leave_lobby_not_inside() {
+    let (creator_address, world, lobby_system) = setup();
+
+    // Create a lobby
+    testing::set_contract_address(creator_address);
+    let (lobby_id, _) = lobby_system.create_lobby('lobby');
+
+    // New player tries to leave the lobby
+    let new_player: ContractAddress = contract_address_const::<'satoshi'>();
+    testing::set_contract_address(new_player);
+    lobby_system.leave_lobby(lobby_id);
+}
+
+// open_lobby()
 
 // *************************************************************************
 //                                 Utilities
