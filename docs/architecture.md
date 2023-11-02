@@ -7,16 +7,16 @@ flowchart TD
     Start[Create Game Lobby] -->|Other Players Join|B[Setup Game]
     B -->|Start Game and Assign Roles Randomly|R[Game Starts]
     R -->D[Day 1]
-    D -->|Events of the Day|E[Day 2]
-    E -->|Next Day's Events|F[Day n]
-    F -->|Events of the Day|G[Someone Wins]
-    G -->|If villagers win|V[Villagers Win]
-    G -->|If wolves win|W[Wolves Win]
+    D -->|Next Day's Events|E[Day n]
+    E -->|End game triggered|F[Someone Wins]
 ```
 
 # Models
 
 Simple overview.
+
+Currently miss a lot of details.
+
 Doesn't include any specific things related to blockchains/dojo for now (e.g. player addresses, etc.):
 
 ```mermaid
