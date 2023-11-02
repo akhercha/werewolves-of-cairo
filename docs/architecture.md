@@ -1,24 +1,70 @@
 # Game loop
 
+Below is a rough outline of the game loop:
+
 ```mermaid
 flowchart TD
-    Start[Create Lobby] -->|Players Join Lobby|A[Setup Lobby(Model: Lobby, Status: Open, Player List: players)]
-    A -->|Start Game|B[Game Starts (Model: Game, Status: Active)]
-    B -->|Assign Roles|C1[Player Model Updates (Status: In Game, Role: Assigned)]
-    C1 -->|Start Day|D[Day Starts (Model: Day, Status: Active)]
-    D -->|Cast Votes|E[Player Model Updates (Vote Cast)]
-    E -->|Resolve Votes|F[Kill Player (Model: Player, Status: Dead) or Continue with Next Day]
-    F -->|Check Win Condition|G[Game Status Update (Villagers Win or Wolves Win)]
-    G -->|If Game Continues|D
-    G -->|If Game Ends|End[Game Ends]
+    Start[Create Game Lobby] -->|Other Players Join|B[Setup Game]
+    B -->|Start Game and Assign Roles Randomly|R[Game Starts]
+    R -->D[Day 1]
+    D -->|Events of the Day|E[Day 2]
+    E -->|Next Day's Events|F[Day n]
+    F -->|Events of the Day|G[Someone Wins]
+    G -->|If villagers win|V[Villagers Win]
+    G -->|If wolves win|W[Wolves Win]
 ```
 
 # Models
 
+Doesn't include any specific things related to blockchains/dojo for now (e.g. player addresses, etc.):
+
 ```mermaid
-graph TD
-    Lobby{Lobby<br/>Status: Open/Closed<br/>Player List: players} --> Player
-    Player{Player<br/>Status: In Lobby/In Game<br/>Role: Not Assigned/Villager/Werewolf<br/>Alive Status: Alive/Dead<br/>Vote: Player ID} --> Game
-    Game{Game<br/>Status: Active/Ended<br/>Current Day: day} --> Day
-    Day{Day<br/>Status: Active/Ended<br/>Events: events} -->|Next| Day
+graph LR
+  subgraph "Lobby Model"
+    Lobby["Lobby 
+    -------
+    Status: 
+      - Open
+      - Closed
+    Player List: 
+      - players"]
+  end
+  subgraph "Player Model"
+    Player["Player 
+    -------
+    Status: 
+      - In Lobby
+      - In Game
+    Role: 
+      - Not Assigned
+      - Villager
+      - Werewolf
+    Alive Status: 
+      - Alive
+      - Dead
+    Vote: 
+      - Player ID"]
+  end
+  subgraph "Game Model"
+    Game["Game 
+    -------
+    Status: 
+      - Active
+      - Ended
+    Current Day: 
+      - day"]
+  end
+  subgraph "Day Model"
+    Day["Day 
+    -------
+    Status: 
+      - Active
+      - Ended
+    Events: 
+      - events"]
+  end
+  Lobby --> Player
+  Player --> Game
+  Game --> Day
+  Day --> Day[Next Day]
 ```
