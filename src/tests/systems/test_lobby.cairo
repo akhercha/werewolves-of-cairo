@@ -246,6 +246,139 @@ fn test_leave_lobby_not_inside() {
 
 // open_lobby()
 
+#[test]
+#[available_gas(300000000)]
+fn test_open_lobby() {
+    let (creator_address, world, lobby_system) = setup();
+
+    // Create a lobby
+    testing::set_contract_address(creator_address);
+    let (lobby_id, _) = lobby_system.create_lobby('lobby');
+
+    // Close it
+    lobby_system.close_lobby(lobby_id);
+
+    // & reopen it
+    lobby_system.open_lobby(lobby_id);
+
+    // Check lobby state
+    let lobby: Lobby = get!(world, lobby_id, Lobby);
+    assert(lobby.creator == creator_address, 'should be creator');
+    assert(lobby.is_open == true, 'should be open');
+}
+
+#[test]
+#[available_gas(300000000)]
+#[should_panic(expected: ('lobby doesnt exists', 'ENTRYPOINT_FAILED'))]
+fn test_open_lobby_does_not_exists() {
+    let (creator_address, world, lobby_system) = setup();
+
+    // Open an unknown lobby
+    lobby_system.open_lobby(45657645);
+}
+
+#[test]
+#[available_gas(300000000)]
+#[should_panic(expected: ('insufficient rights', 'ENTRYPOINT_FAILED'))]
+fn test_open_lobby_not_enough_rights() {
+    let (creator_address, world, lobby_system) = setup();
+
+    // Create a lobby
+    testing::set_contract_address(creator_address);
+    let (lobby_id, _) = lobby_system.create_lobby('lobby');
+
+    // New player joins lobby
+    let new_player: ContractAddress = contract_address_const::<'satoshi'>();
+    testing::set_contract_address(new_player);
+    lobby_system.join_lobby(lobby_id);
+
+    // Admin close lobby
+    testing::set_contract_address(creator_address);
+    lobby_system.close_lobby(lobby_id);
+
+    // And new player tries to re-open it
+    testing::set_contract_address(new_player);
+    lobby_system.open_lobby(lobby_id);
+}
+
+#[test]
+#[available_gas(300000000)]
+#[should_panic(expected: ('lobby is already open', 'ENTRYPOINT_FAILED'))]
+fn test_open_lobby_already_open() {
+    let (creator_address, world, lobby_system) = setup();
+
+    // Create a lobby
+    testing::set_contract_address(creator_address);
+    let (lobby_id, _) = lobby_system.create_lobby('lobby');
+
+    // And try to open it
+    lobby_system.open_lobby(lobby_id);
+}
+
+// close_lobby()
+
+#[test]
+#[available_gas(300000000)]
+fn test_close_lobby() {
+    let (creator_address, world, lobby_system) = setup();
+
+    // Create a lobby
+    testing::set_contract_address(creator_address);
+    let (lobby_id, _) = lobby_system.create_lobby('lobby');
+
+    // Close it
+    lobby_system.close_lobby(lobby_id);
+
+    // Check lobby state
+    let lobby: Lobby = get!(world, lobby_id, Lobby);
+    assert(lobby.creator == creator_address, 'should be creator');
+    assert(lobby.is_open == false, 'should be closed');
+}
+
+#[test]
+#[available_gas(300000000)]
+#[should_panic(expected: ('lobby doesnt exists', 'ENTRYPOINT_FAILED'))]
+fn test_close_lobby_does_not_exists() {
+    let (creator_address, world, lobby_system) = setup();
+
+    // Open an unknown lobby
+    lobby_system.close_lobby(45657645);
+}
+
+#[test]
+#[available_gas(300000000)]
+#[should_panic(expected: ('insufficient rights', 'ENTRYPOINT_FAILED'))]
+fn test_close_lobby_not_enough_rights() {
+    let (creator_address, world, lobby_system) = setup();
+
+    // Create a lobby
+    testing::set_contract_address(creator_address);
+    let (lobby_id, _) = lobby_system.create_lobby('lobby');
+
+    // New player joins lobby
+    let new_player: ContractAddress = contract_address_const::<'satoshi'>();
+    testing::set_contract_address(new_player);
+    lobby_system.join_lobby(lobby_id);
+
+    // and new player tries to close it
+    lobby_system.close_lobby(lobby_id);
+}
+
+#[test]
+#[available_gas(300000000)]
+#[should_panic(expected: ('lobby is already closed', 'ENTRYPOINT_FAILED'))]
+fn test_close_lobby_already_closed() {
+    let (creator_address, world, lobby_system) = setup();
+
+    // Create a lobby
+    testing::set_contract_address(creator_address);
+    let (lobby_id, _) = lobby_system.create_lobby('lobby');
+
+    // and close it twice
+    lobby_system.close_lobby(lobby_id);
+    lobby_system.close_lobby(lobby_id);
+}
+
 // *************************************************************************
 //                                 Utilities
 // *************************************************************************
