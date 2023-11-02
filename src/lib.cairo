@@ -5,7 +5,10 @@ mod models {
     mod lobby;
     mod game;
 }
-mod systems {}
+mod systems {
+    mod lobby;
+    mod game;
+}
 mod utils {
     mod random;
     mod settings;
