@@ -38,7 +38,7 @@ mod lobby {
     use werewolves_of_cairo::models::lobby::{Lobby, LobbyTrait};
     use werewolves_of_cairo::models::game::{Game, GameTrait};
     use werewolves_of_cairo::models::waiter::{Waiter, WaiterTrait};
-    use werewolves_of_cairo::models::player::{Player, PlayerTrait, PlayerStatus, PlayerRole};
+    use werewolves_of_cairo::models::player::{Player, PlayerTrait};
     use werewolves_of_cairo::utils::string::assert_valid_string;
 
     use super::ILobby;
