@@ -1,5 +1,5 @@
 [package]
-cairo-version = "2.2.0"
+cairo-version = "2.3.1"
 name = "werewolves_of_cairo"
 version = "0.0.1"
 
@@ -7,7 +7,7 @@ version = "0.0.1"
 sierra-replace-ids = true
 
 [dependencies]
-dojo = { git = "https://github.com/dojoengine/dojo", version = "0.3.2" }
+dojo = { git = "https://github.com/dojoengine/dojo", version = "0.3.3" }
 
 [[target.dojo]]
 
