@@ -38,4 +38,14 @@ impl GameImpl of GameTrait {
 
         true
     }
+
+    fn new(game_id: u32, creator: ContractAddress, start_time: u64, num_players: usize) -> Game {
+        Game {
+            game_id: game_id,
+            creator: creator,
+            start_time: start_time,
+            is_active: true,
+            num_players: num_players
+        }
+    }
 }

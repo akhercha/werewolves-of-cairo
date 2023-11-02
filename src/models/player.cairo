@@ -1,4 +1,4 @@
-use starknet::ContractAddress;
+use starknet::{ContractAddress, contract_address_const};
 use dojo::database::schema::{
     Enum, Member, Ty, Struct, SchemaIntrospection, serialize_member, serialize_member_type
 };
@@ -45,7 +45,18 @@ enum PlayerRole {
 // *************************************************************************
 
 #[generate_trait]
-impl PlayerImpl of PlayerTrait {}
+impl PlayerImpl of PlayerTrait {
+    fn new(game_id: u32, caller_address: ContractAddress) -> Player {
+        Player {
+            game_id: game_id,
+            player_id: caller_address,
+            player_status: PlayerStatus::Alive(()),
+            // TODO: randomly determine role
+            player_role: PlayerRole::Townfolk(()),
+            vote_for: contract_address_const::<0>()
+        }
+    }
+}
 
 // *************************************************************************
 //                           Schema Introspections

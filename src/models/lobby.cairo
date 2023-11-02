@@ -14,13 +14,13 @@ use werewolves_of_cairo::utils::settings::{LobbySettings, LobbySettingsImpl};
 struct Lobby {
     #[key]
     lobby_id: u32,
-    #[key]
     creator: ContractAddress,
     name: felt252,
     is_open: bool,
     min_players: usize,
     max_players: usize,
     num_players: usize,
+    waiter_next_id: u32
 }
 
 // *************************************************************************
@@ -33,13 +33,14 @@ impl LobbyImpl of LobbyTrait {
         let lobby_settings = LobbySettingsImpl::get();
 
         Lobby {
-            lobby_id: lobby_id,
-            creator: creator,
+            lobby_id,
+            creator,
             name: lobby_name,
             is_open: true,
             min_players: lobby_settings.min_players,
             max_players: lobby_settings.max_players,
-            num_players: 1
+            num_players: 1,
+            waiter_next_id: 1
         }
     }
 
