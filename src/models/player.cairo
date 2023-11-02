@@ -2,6 +2,7 @@ use starknet::{ContractAddress, contract_address_const};
 use dojo::database::schema::{
     Enum, Member, Ty, Struct, SchemaIntrospection, serialize_member, serialize_member_type
 };
+use werewolves_of_cairo::models::role::RoleEnum;
 
 // *************************************************************************
 //                                   Model
@@ -14,7 +15,7 @@ struct Player {
     #[key]
     player_id: ContractAddress,
     player_status: PlayerStatus,
-    player_role: PlayerRole,
+    player_role: RoleEnum,
     vote_for: ContractAddress
 }
 
@@ -26,18 +27,6 @@ struct Player {
 enum PlayerStatus {
     Alive: (),
     Dead: ()
-}
-
-#[derive(Copy, Drop, Serde, PartialEq)]
-enum PlayerRole {
-    Townfolk: (),
-    Werewolf: (),
-    FortuneTeller: (),
-    LittleGirl: (),
-    Witch: (),
-    Thief: (),
-    Hunter: (),
-    Cupido: ()
 }
 
 // *************************************************************************
@@ -52,7 +41,7 @@ impl PlayerImpl of PlayerTrait {
             player_id: caller_address,
             player_status: PlayerStatus::Alive(()),
             // TODO: randomly determine role
-            player_role: PlayerRole::Townfolk(()),
+            player_role: RoleEnum::Townfolk,
             vote_for: contract_address_const::<0>()
         }
     }
@@ -82,39 +71,6 @@ impl PlayerStatusIntrospectionImpl of SchemaIntrospection<PlayerStatus> {
                 children: array![
                     ('Alive', serialize_member_type(@Ty::Tuple(array![].span()))),
                     ('Dead', serialize_member_type(@Ty::Tuple(array![].span()))),
-                ]
-                    .span()
-            }
-        )
-    }
-}
-
-impl PlayerRoleIntrospectionImpl of SchemaIntrospection<PlayerRole> {
-    #[inline(always)]
-    fn size() -> usize {
-        1
-    }
-
-    #[inline(always)]
-    fn layout(ref layout: Array<u8>) {
-        layout.append(8);
-    }
-
-    #[inline(always)]
-    fn ty() -> Ty {
-        Ty::Enum(
-            Enum {
-                name: 'PlayerRole',
-                attrs: array![].span(),
-                children: array![
-                    ('Townfolk', serialize_member_type(@Ty::Tuple(array![].span()))),
-                    ('Werewolf', serialize_member_type(@Ty::Tuple(array![].span()))),
-                    ('FortuneTeller', serialize_member_type(@Ty::Tuple(array![].span()))),
-                    ('LittleGirl', serialize_member_type(@Ty::Tuple(array![].span()))),
-                    ('Witch', serialize_member_type(@Ty::Tuple(array![].span()))),
-                    ('Thief', serialize_member_type(@Ty::Tuple(array![].span()))),
-                    ('Hunter', serialize_member_type(@Ty::Tuple(array![].span()))),
-                    ('Cupido', serialize_member_type(@Ty::Tuple(array![].span()))),
                 ]
                     .span()
             }

@@ -4,6 +4,7 @@ mod models {
     mod player;
     mod lobby;
     mod game;
+    mod role;
 }
 mod systems {
     mod lobby;
@@ -15,5 +16,14 @@ mod utils {
     mod string;
 }
 
+// Tests
+
 #[cfg(test)]
-mod tests {}
+mod tests {
+    mod models {
+        mod test_waiter;
+    }
+    mod systems {
+        mod test_lobby;
+    }
+}
