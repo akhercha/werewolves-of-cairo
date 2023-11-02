@@ -2,21 +2,18 @@ use starknet::ContractAddress;
 use dojo::database::schema::{
     Enum, Member, Ty, Struct, SchemaIntrospection, serialize_member, serialize_member_type
 };
-use dojo::world::{IWorld, IWorldDispatcher, IWorldDispatcherTrait};
 
 // *************************************************************************
-//                                     MODEL
+//                                   Model
 // *************************************************************************
 
 #[derive(Model, Copy, Drop, Serde)]
-struct Game {
+struct Waiter {
     #[key]
-    game_id: u32,
+    lobby_id: u32,
     #[key]
-    creator: ContractAddress,
-    start_time: u64,
-    is_active: bool,
-    num_players: usize,
+    waiter_id: ContractAddress,
+    is_waiting: bool
 }
 
 // *************************************************************************
@@ -24,18 +21,8 @@ struct Game {
 // *************************************************************************
 
 #[generate_trait]
-impl GameImpl of GameTrait {
-    #[inline(always)]
-    fn tick(self: Game) -> bool {
-        let info = starknet::get_block_info().unbox();
-
-        if info.block_timestamp < self.start_time {
-            return false;
-        }
-        if !self.is_active {
-            return false;
-        }
-
-        true
+impl WaiterImpl of WaiterTrait {
+    fn new(lobby_id: u32, waiter_id: ContractAddress) -> Waiter {
+        Waiter { lobby_id: lobby_id, waiter_id: waiter_id, is_waiting: true }
     }
 }

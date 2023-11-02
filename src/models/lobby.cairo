@@ -4,18 +4,22 @@ use dojo::database::schema::{
 };
 use dojo::world::{IWorld, IWorldDispatcher, IWorldDispatcherTrait};
 
+use werewolves_of_cairo::utils::settings::{LobbySettings, LobbySettingsImpl};
+
 // *************************************************************************
 //                                     MODEL
 // *************************************************************************
 
 #[derive(Model, Copy, Drop, Serde)]
-struct Game {
+struct Lobby {
     #[key]
-    game_id: u32,
+    lobby_id: u32,
     #[key]
     creator: ContractAddress,
-    start_time: u64,
-    is_active: bool,
+    name: felt252,
+    is_open: bool,
+    min_players: usize,
+    max_players: usize,
     num_players: usize,
 }
 
@@ -24,18 +28,22 @@ struct Game {
 // *************************************************************************
 
 #[generate_trait]
-impl GameImpl of GameTrait {
-    #[inline(always)]
-    fn tick(self: Game) -> bool {
-        let info = starknet::get_block_info().unbox();
+impl LobbyImpl of LobbyTrait {
+    fn new(lobby_id: u32, creator: ContractAddress, lobby_name: felt252) -> Lobby {
+        let lobby_settings = LobbySettingsImpl::get();
 
-        if info.block_timestamp < self.start_time {
-            return false;
+        Lobby {
+            lobby_id: lobby_id,
+            creator: creator,
+            name: lobby_name,
+            is_open: true,
+            min_players: lobby_settings.min_players,
+            max_players: lobby_settings.max_players,
+            num_players: 1
         }
-        if !self.is_active {
-            return false;
-        }
+    }
 
-        true
+    fn can_start(self: Lobby) -> bool {
+        self.num_players >= self.min_players && self.num_players <= self.max_players
     }
 }
