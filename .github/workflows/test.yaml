@@ -13,3 +13,4 @@ jobs:
     - run: /home/runner/.config/.dojo/bin/dojoup -v v0.3.3
     - run: |
         /home/runner/.config/.dojo/bin/sozo build
+        /home/runner/.config/.dojo/bin/sozo test
