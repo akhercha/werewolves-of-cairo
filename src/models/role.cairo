@@ -17,7 +17,6 @@ enum RoleEnum {
     Thief, // 5
     Hunter, // 6
     Cupido, // 7
-// Hospital
 }
 
 impl RoleEnumIntoFelt252 of Into<RoleEnum, felt252> {
