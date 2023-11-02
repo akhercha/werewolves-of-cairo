@@ -2,6 +2,8 @@
 
 Recreation of the game Werewolves of Millers Hollow on the Starknet blockchain using Dojo.
 
+[[Architecture documentation]](docs/architecture.md)
+
 ## Get started
 
 ```bash
