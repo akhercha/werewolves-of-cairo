@@ -19,6 +19,12 @@ trait ILobby<TContractState> {
 
     // Leave a lobby
     fn leave_lobby(self: @TContractState, lobby_id: u32) -> (u32, ContractAddress);
+
+    // Opens a lobby
+    fn open_lobby(self: @TContractState, lobby_id: u32) -> (u32, ContractAddress);
+
+    // Close a lobby
+    fn close_lobby(self: @TContractState, lobby_id: u32) -> (u32, ContractAddress);
 }
 
 // *************************************************************************
@@ -55,6 +61,8 @@ mod lobby {
     #[derive(Drop, starknet::Event)]
     enum Event {
         LobbyCreated: LobbyCreated,
+        LobbyOpened: LobbyOpened,
+        LobbyClosed: LobbyClosed,
         PlayerJoinedLobby: PlayerJoinedLobby,
         PlayerLeftLobby: PlayerLeftLobby,
         GameCreated: GameCreated,
@@ -67,6 +75,16 @@ mod lobby {
         name: felt252,
         min_players: usize,
         max_players: usize,
+    }
+
+    #[derive(Drop, starknet::Event)]
+    struct LobbyOpened {
+        lobby_id: u32
+    }
+
+    #[derive(Drop, starknet::Event)]
+    struct LobbyClosed {
+        lobby_id: u32
     }
 
     #[derive(Drop, starknet::Event)]
@@ -164,7 +182,7 @@ mod lobby {
 
             let mut lobby = get!(self.world(), lobby_id, Lobby);
             assert(lobby.creator != contract_address_const::<0>(), 'lobby doesnt exists');
-            assert(lobby.creator != caller_address, 'caller is creator');
+            assert(lobby.creator != caller_address, 'creator cant join lobby');
             assert(lobby.is_open, 'lobby isnt open');
             assert(lobby.num_players < lobby.max_players, 'lobby is full');
             let (is_in_lobby, _) = self._is_in_lobby(caller_address, lobby);
@@ -194,6 +212,32 @@ mod lobby {
 
             set!(self.world(), (lobby, waiter));
             emit!(self.world(), PlayerLeftLobby { lobby_id, player_id: caller_address });
+        }
+
+        fn open_lobby(self: @TContractState, lobby_id: u32) -> (u32, ContractAddress) {
+            let caller_address = get_caller_address();
+
+            let mut lobby = get!(self.world(), lobby_id, Lobby);
+            assert(lobby.creator != contract_address_const::<0>(), 'lobby doesnt exists');
+            assert(lobby.creator == caller_address, 'insufficient rights');
+            assert(!lobby.is_open, 'lobby is already open');
+
+            lobby.is_open = true;
+            set!(self.world(), (lobby));
+            emit!(self.world(), LobbyOpened { lobby_id });
+        }
+
+        fn close_lobby(self: @TContractState, lobby_id: u32) -> (u32, ContractAddress) {
+            let caller_address = get_caller_address();
+
+            let mut lobby = get!(self.world(), lobby_id, Lobby);
+            assert(lobby.creator != contract_address_const::<0>(), 'lobby doesnt exists');
+            assert(lobby.creator == caller_address, 'insufficient rights');
+            assert(lobby.is_open, 'lobby is already closed');
+
+            lobby.is_open = false;
+            set!(self.world(), (lobby));
+            emit!(self.world(), LobbyOpened { lobby_id });
         }
 
         #[generate_trait]
