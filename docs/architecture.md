@@ -16,6 +16,7 @@ flowchart TD
 
 # Models
 
+Simple overview.
 Doesn't include any specific things related to blockchains/dojo for now (e.g. player addresses, etc.):
 
 ```mermaid
@@ -23,48 +24,40 @@ graph LR
   subgraph "Lobby Model"
     Lobby["Lobby 
     -------
-    Status: 
-      - Open
-      - Closed
-    Player List: 
-      - players"]
+    - ID
+    - Creator Player ID
+    - Status
+    - Player List"]
   end
   subgraph "Player Model"
     Player["Player 
     -------
-    Status: 
-      - In Lobby
-      - In Game
-    Role: 
-      - Not Assigned
-      - Villager
-      - Werewolf
-    Alive Status: 
-      - Alive
-      - Dead
-    Vote: 
-      - Player ID"]
+    - ID
+    - Status
+    - Lobby ID
+    - Role
+    - Alive Status
+    - Vote"]
   end
   subgraph "Game Model"
     Game["Game 
     -------
-    Status: 
-      - Active
-      - Ended
-    Current Day: 
-      - day"]
+    - ID
+    - Lobby ID
+    - Status
+    - Current Day"]
   end
   subgraph "Day Model"
     Day["Day 
     -------
-    Status: 
-      - Active
-      - Ended
-    Events: 
-      - events"]
+    - ID
+    - Game ID
+    - Status
+    - Number
+    - Events"]
   end
   Lobby --> Player
   Player --> Game
   Game --> Day
-  Day --> Day[Next Day]
+  Day -.-> Day[Next Day]
 ```
