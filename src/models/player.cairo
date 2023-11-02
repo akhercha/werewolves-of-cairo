@@ -13,6 +13,7 @@ struct Player {
     #[key]
     game_id: u32,
     #[key]
+    index: usize,
     player_id: ContractAddress,
     player_status: PlayerStatus,
     player_role: RoleEnum,
@@ -35,9 +36,10 @@ enum PlayerStatus {
 
 #[generate_trait]
 impl PlayerImpl of PlayerTrait {
-    fn new(game_id: u32, caller_address: ContractAddress) -> Player {
+    fn new(game_id: u32, index: usize, caller_address: ContractAddress) -> Player {
         Player {
-            game_id: game_id,
+            game_id,
+            index,
             player_id: caller_address,
             player_status: PlayerStatus::Alive(()),
             // TODO: randomly determine role

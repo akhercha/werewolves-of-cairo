@@ -49,6 +49,12 @@ impl RoleEnumIntoU8 of Into<RoleEnum, u8> {
     }
 }
 
+impl U8IntoRoleEnum of Into<u8, RoleEnum> {
+    fn into(self: u8) -> RoleEnum {
+        let self: u8 = self % 8;
+        *RoleTrait::all().at(self.into())
+    }
+}
 
 impl RoleEnumIntrospectionImpl of SchemaIntrospection<RoleEnum> {
     #[inline(always)]
@@ -87,7 +93,7 @@ impl RoleEnumIntrospectionImpl of SchemaIntrospection<RoleEnum> {
 #[generate_trait]
 impl RoleImpl of RoleTrait {
     fn all() -> Span<RoleEnum> {
-        let mut roles = array![
+        array![
             RoleEnum::Townfolk,
             RoleEnum::Werewolf,
             RoleEnum::FortuneTeller,
@@ -96,8 +102,8 @@ impl RoleImpl of RoleTrait {
             RoleEnum::Thief,
             RoleEnum::Hunter,
             RoleEnum::Cupido,
-        ];
-        roles.span()
+        ]
+            .span()
     }
 
     fn random() -> RoleEnum {

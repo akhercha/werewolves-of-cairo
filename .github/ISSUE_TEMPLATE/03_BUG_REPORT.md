@@ -1,6 +1,6 @@
 ---
 name: Bug Report
-about: Create a report to help Satoru to improve
+about: Create a report to help Werewolves of Cairo to improve
 title: "bug: "
 labels: "bug"
 assignees: ""
@@ -8,7 +8,7 @@ assignees: ""
 
 # Bug Report
 
-**Satoru version:**
+**Werewolves of Cairo version:**
 
 <!-- Please specify commit or tag version. -->
 

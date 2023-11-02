@@ -1,4 +1,7 @@
 mod constants;
+mod data {
+    mod compositions;
+}
 mod models {
     mod waiter;
     mod player;

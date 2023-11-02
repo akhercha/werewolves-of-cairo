@@ -79,7 +79,7 @@ mod lobby {
                     waiter.waiter_id != contract_address_const::<0>(), 'waiter should have addr'
                 );
 
-                let player_from_waiter = PlayerTrait::new(game_id, waiter.waiter_id);
+                let player_from_waiter = PlayerTrait::new(game_id, waiter_idx, waiter.waiter_id);
                 set!(self.world(), (player_from_waiter));
                 waiter_idx += 1;
             };

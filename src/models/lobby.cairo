@@ -44,7 +44,7 @@ impl LobbyImpl of LobbyTrait {
         }
     }
 
-    fn can_start(self: Lobby) -> bool {
-        self.num_players >= self.min_players && self.num_players <= self.max_players
+    fn can_start(self: @Lobby) -> bool {
+        *self.num_players >= *self.min_players && *self.num_players <= *self.max_players
     }
 }
