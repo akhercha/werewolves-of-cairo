@@ -10,7 +10,7 @@ fn random(min: u128, max: u128) -> u128 {
     let nonce = get_seed();
     let seed = pedersen::pedersen(seed, nonce);
     let seed: u256 = seed.into();
-    let range = max + 1 - min;
+    let range = max - min;
 
     (seed.low % range) + min
 }

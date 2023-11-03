@@ -2,7 +2,7 @@ use starknet::{ContractAddress, contract_address_const};
 use dojo::database::schema::{
     Enum, Member, Ty, Struct, SchemaIntrospection, serialize_member, serialize_member_type
 };
-use werewolves_of_cairo::entities::role::RoleEnum;
+use werewolves_of_cairo::entities::role::Role;
 
 // *************************************************************************
 //                                   Model
@@ -16,7 +16,7 @@ struct Player {
     index: usize,
     player_id: ContractAddress,
     player_status: PlayerStatus,
-    player_role: RoleEnum,
+    player_role: Role,
     vote_for: ContractAddress
 }
 
@@ -43,7 +43,7 @@ impl PlayerImpl of PlayerTrait {
             player_id: caller_address,
             player_status: PlayerStatus::Alive(()),
             // TODO: randomly determine role
-            player_role: RoleEnum::Townfolk,
+            player_role: Role::Townfolk,
             vote_for: contract_address_const::<0>()
         }
     }

@@ -24,7 +24,7 @@ impl RandomizerImpl of RandomizerTrait {
         let seed = pedersen::pedersen(seed, self.nonce);
         let seed: u256 = seed.into();
         self.nonce += 1;
-        let range = max + 1 - min;
+        let range = max - min;
 
         (seed.low % range) + min
     }
@@ -37,7 +37,7 @@ impl RandomizerImpl of RandomizerTrait {
         let seed = pedersen::pedersen(seed, self.nonce);
         let seed: u256 = seed.into();
         self.nonce += 1;
-        let range = max + 1 - min;
+        let range = max - min;
 
         (seed.low % range) + min
     }

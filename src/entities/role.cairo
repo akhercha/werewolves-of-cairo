@@ -5,10 +5,10 @@ use dojo::database::schema::{
 
 use werewolves_of_cairo::utils::random::random;
 
-struct Role {}
+const NBR_OF_ROLES: usize = 8;
 
 #[derive(Copy, Drop, Serde, PartialEq)]
-enum RoleEnum {
+enum Role {
     Townfolk, // 0
     Werewolf, // 1
     FortuneTeller, // 2
@@ -19,44 +19,68 @@ enum RoleEnum {
     Cupido, // 7
 }
 
-impl RoleEnumIntoFelt252 of Into<RoleEnum, felt252> {
-    fn into(self: RoleEnum) -> felt252 {
+#[generate_trait]
+impl RoleImpl of RoleTrait {
+    fn all() -> Span<Role> {
+        array![
+            Role::Townfolk,
+            Role::Werewolf,
+            Role::FortuneTeller,
+            Role::LittleGirl,
+            Role::Witch,
+            Role::Thief,
+            Role::Hunter,
+            Role::Cupido,
+        ]
+            .span()
+    }
+
+    fn random() -> Role {
+        let roles = RoleImpl::all();
+        let index = random(0, roles.len().into());
+
+        *roles.at(index.try_into().unwrap())
+    }
+}
+
+impl RoleIntoFelt252 of Into<Role, felt252> {
+    fn into(self: Role) -> felt252 {
         match self {
-            RoleEnum::Townfolk => 'Townfolk',
-            RoleEnum::Werewolf => 'Werewolf',
-            RoleEnum::FortuneTeller => 'FortuneTeller',
-            RoleEnum::LittleGirl => 'LittleGirl',
-            RoleEnum::Witch => 'Witch',
-            RoleEnum::Thief => 'Thief',
-            RoleEnum::Hunter => 'Hunter',
-            RoleEnum::Cupido => 'Cupido',
+            Role::Townfolk => 'Townfolk',
+            Role::Werewolf => 'Werewolf',
+            Role::FortuneTeller => 'FortuneTeller',
+            Role::LittleGirl => 'LittleGirl',
+            Role::Witch => 'Witch',
+            Role::Thief => 'Thief',
+            Role::Hunter => 'Hunter',
+            Role::Cupido => 'Cupido',
         }
     }
 }
 
-impl RoleEnumIntoU8 of Into<RoleEnum, u8> {
-    fn into(self: RoleEnum) -> u8 {
+impl RoleIntoU8 of Into<Role, u8> {
+    fn into(self: Role) -> u8 {
         match self {
-            RoleEnum::Townfolk => 0,
-            RoleEnum::Werewolf => 1,
-            RoleEnum::FortuneTeller => 2,
-            RoleEnum::LittleGirl => 3,
-            RoleEnum::Witch => 4,
-            RoleEnum::Thief => 5,
-            RoleEnum::Hunter => 6,
-            RoleEnum::Cupido => 7,
+            Role::Townfolk => 0,
+            Role::Werewolf => 1,
+            Role::FortuneTeller => 2,
+            Role::LittleGirl => 3,
+            Role::Witch => 4,
+            Role::Thief => 5,
+            Role::Hunter => 6,
+            Role::Cupido => 7,
         }
     }
 }
 
-impl U8IntoRoleEnum of Into<u8, RoleEnum> {
-    fn into(self: u8) -> RoleEnum {
+impl U8IntoRole of Into<u8, Role> {
+    fn into(self: u8) -> Role {
         let self: u8 = self % 8;
         *RoleTrait::all().at(self.into())
     }
 }
 
-impl RoleEnumIntrospectionImpl of SchemaIntrospection<RoleEnum> {
+impl RoleIntrospectionImpl of SchemaIntrospection<Role> {
     #[inline(always)]
     fn size() -> usize {
         1
@@ -71,7 +95,7 @@ impl RoleEnumIntrospectionImpl of SchemaIntrospection<RoleEnum> {
     fn ty() -> Ty {
         Ty::Enum(
             Enum {
-                name: 'RoleEnum',
+                name: 'Role',
                 attrs: array![].span(),
                 children: array![
                     ('Townfolk', serialize_member_type(@Ty::Tuple(array![].span()))),
@@ -86,30 +110,5 @@ impl RoleEnumIntrospectionImpl of SchemaIntrospection<RoleEnum> {
                     .span()
             }
         )
-    }
-}
-
-
-#[generate_trait]
-impl RoleImpl of RoleTrait {
-    fn all() -> Span<RoleEnum> {
-        array![
-            RoleEnum::Townfolk,
-            RoleEnum::Werewolf,
-            RoleEnum::FortuneTeller,
-            RoleEnum::LittleGirl,
-            RoleEnum::Witch,
-            RoleEnum::Thief,
-            RoleEnum::Hunter,
-            RoleEnum::Cupido,
-        ]
-            .span()
-    }
-
-    fn random() -> RoleEnum {
-        let roles = RoleImpl::all();
-        let index = random(0, roles.len().into());
-
-        *roles.at(index.try_into().unwrap())
     }
 }
