@@ -7,6 +7,7 @@ mod entities {
     mod randomizer;
 }
 mod models {
+    mod profile;
     mod waiter;
     mod player;
     mod lobby;
@@ -15,6 +16,7 @@ mod models {
 mod systems {
     mod lobby;
     mod game;
+    mod register;
 }
 mod utils {
     mod random;
@@ -36,6 +38,7 @@ mod tests {
     }
     mod systems {
         mod test_lobby;
+        mod test_register;
     }
     mod test_utils;
 }
