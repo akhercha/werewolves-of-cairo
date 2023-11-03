@@ -31,4 +31,5 @@ mod tests {
     mod systems {
         mod test_lobby;
     }
+    mod test_utils;
 }
