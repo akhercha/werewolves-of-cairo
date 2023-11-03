@@ -4,9 +4,14 @@ use starknet::{ContractAddress, contract_address_const, Felt252TryIntoContractAd
 use dojo::world::{IWorldDispatcherTrait, IWorldDispatcher};
 use dojo::test_utils::{spawn_test_world, deploy_contract};
 
+use werewolves_of_cairo::models::profile::{profile, Profile};
 use werewolves_of_cairo::models::waiter::{waiter, Waiter};
 use werewolves_of_cairo::models::lobby::{lobby, Lobby};
 use werewolves_of_cairo::utils::settings::{LobbySettings, LobbySettingsImpl};
+
+use werewolves_of_cairo::systems::register::{
+    IRegisterDispatcher, IRegisterDispatcherTrait, register as register_system
+};
 
 use werewolves_of_cairo::systems::lobby::{
     ILobbyDispatcher, ILobbyDispatcherTrait, lobby as lobby_system
@@ -21,17 +26,20 @@ use werewolves_of_cairo::systems::lobby::{
 #[test]
 #[available_gas(300000000)]
 fn test_create_lobby() {
-    let (caller_address, world, lobby_system) = setup();
-    testing::set_contract_address(caller_address);
+    let (creator_address, world, register_system, lobby_system) = setup();
+
+    // Registers a profile
+    testing::set_contract_address(creator_address);
+    register_system.register('creator');
 
     // Create a lobby
     let lobby_name: felt252 = 'good lobby';
     let (lobby_id, creator) = lobby_system.create_lobby(lobby_name);
-    assert(creator == caller_address, 'wrong returned creator');
+    assert(creator == creator_address, 'wrong returned creator');
 
     // Check lobby in world state
     let lobby_created: Lobby = get!(world, lobby_id, Lobby);
-    assert(lobby_created.creator == caller_address, 'should be caller');
+    assert(lobby_created.creator == creator_address, 'should be caller');
     assert(lobby_created.name == lobby_name, 'should be lobby_name');
     assert(lobby_created.num_players == 1, 'should have 1 player');
     assert(lobby_created.is_open == true, 'should be open');
@@ -42,7 +50,11 @@ fn test_create_lobby() {
 #[available_gas(300000000)]
 #[should_panic(expected: ('Name too short', 'ENTRYPOINT_FAILED'))]
 fn test_create_lobby_invalid_name_too_short() {
-    let (_, _, lobby_system) = setup();
+    let (creator_address, world, register_system, lobby_system) = setup();
+
+    // Registers a profile
+    testing::set_contract_address(creator_address);
+    register_system.register('creator');
 
     lobby_system.create_lobby(0);
 }
@@ -51,7 +63,7 @@ fn test_create_lobby_invalid_name_too_short() {
 #[available_gas(300000000)]
 #[should_panic(expected: ('Name too long', 'ENTRYPOINT_FAILED'))]
 fn test_create_lobby_invalid_name_too_long() {
-    let (_, _, lobby_system) = setup();
+    let (creator_address, world, register_system, lobby_system) = setup();
 
     let lobby_name: felt252 = 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa';
     lobby_system.create_lobby(lobby_name);
@@ -62,15 +74,21 @@ fn test_create_lobby_invalid_name_too_long() {
 #[test]
 #[available_gas(300000000)]
 fn test_join_lobby() {
-    let (creator_address, world, lobby_system) = setup();
+    let (creator_address, world, register_system, lobby_system) = setup();
 
-    // Create a lobby
+    // Creator registers ...
     testing::set_contract_address(creator_address);
+    register_system.register('creator');
+
+    // ... & Create a lobby
     let (lobby_id, _) = lobby_system.create_lobby('lobby');
 
-    // New player joins lobby
+    // New player creates a profile ...
     let new_player: ContractAddress = contract_address_const::<'satoshi'>();
     testing::set_contract_address(new_player);
+    register_system.register('satoshi');
+
+    // ... & joins lobby
     lobby_system.join_lobby(lobby_id);
 
     // Check new player in world state
@@ -89,11 +107,15 @@ fn test_join_lobby() {
 #[available_gas(300000000)]
 #[should_panic(expected: ('lobby doesnt exists', 'ENTRYPOINT_FAILED'))]
 fn test_join_lobby_does_not_exist() {
-    let (creator_address, world, lobby_system) = setup();
+    let (creator_address, world, register_system, lobby_system) = setup();
 
-    // New player tries to joins lobby
     let new_player: ContractAddress = contract_address_const::<'satoshi'>();
     testing::set_contract_address(new_player);
+
+    // New player registers a profile
+    register_system.register('satoshi');
+
+    // New player tries to joins lobby
     lobby_system.join_lobby(45678);
 }
 
@@ -101,10 +123,13 @@ fn test_join_lobby_does_not_exist() {
 #[available_gas(300000000)]
 #[should_panic(expected: ('creator cant join lobby', 'ENTRYPOINT_FAILED'))]
 fn test_join_lobby_by_creator() {
-    let (creator_address, world, lobby_system) = setup();
+    let (creator_address, world, register_system, lobby_system) = setup();
+
+    // Registers a profile
+    testing::set_contract_address(creator_address);
+    register_system.register('creator');
 
     // Create a lobby
-    testing::set_contract_address(creator_address);
     let (lobby_id, _) = lobby_system.create_lobby('lobby');
 
     // Creator tries to join lobby
@@ -115,17 +140,24 @@ fn test_join_lobby_by_creator() {
 #[available_gas(300000000)]
 #[should_panic(expected: ('lobby isnt open', 'ENTRYPOINT_FAILED'))]
 fn test_join_lobby_closed() {
-    let (creator_address, world, lobby_system) = setup();
+    let (creator_address, world, register_system, lobby_system) = setup();
+
+    // Register a profile
+    testing::set_contract_address(creator_address);
+    register_system.register('creator');
 
     // Create a lobby
-    testing::set_contract_address(creator_address);
     let (lobby_id, _) = lobby_system.create_lobby('lobby');
+
     // Close the lobby
     lobby_system.close_lobby(lobby_id);
 
-    // New player tries to join lobby
+    // New player register a profile
     let new_player: ContractAddress = contract_address_const::<'satoshi'>();
     testing::set_contract_address(new_player);
+    register_system.register('satoshi');
+
+    // And tries to join lobby
     lobby_system.join_lobby(lobby_id);
 }
 
@@ -133,16 +165,23 @@ fn test_join_lobby_closed() {
 #[available_gas(300000000)]
 #[should_panic(expected: ('caller already in lobby', 'ENTRYPOINT_FAILED'))]
 fn test_join_lobby_already_in() {
-    let (creator_address, world, lobby_system) = setup();
+    let (creator_address, world, register_system, lobby_system) = setup();
+
+    // Register a profile
+    testing::set_contract_address(creator_address);
+    register_system.register('creator');
 
     // Create a lobby
-    testing::set_contract_address(creator_address);
     let (lobby_id, _) = lobby_system.create_lobby('lobby');
 
-    // New player tries to join lobby one time...
+    // New player register a profile
     let new_player: ContractAddress = contract_address_const::<'satoshi'>();
     testing::set_contract_address(new_player);
+    register_system.register('satoshi');
+
+    // And tries to join lobby ...
     lobby_system.join_lobby(lobby_id);
+
     // ... and a second time
     lobby_system.join_lobby(lobby_id);
 }
@@ -151,11 +190,14 @@ fn test_join_lobby_already_in() {
 #[available_gas(300000000)]
 #[should_panic(expected: ('lobby is full', 'ENTRYPOINT_FAILED'))]
 fn test_join_lobby_full() {
-    let (creator_address, world, lobby_system) = setup();
+    let (creator_address, world, register_system, lobby_system) = setup();
     let lobby_settings = LobbySettingsImpl::get();
 
-    // Create a lobby
+    // Register a profile
     testing::set_contract_address(creator_address);
+    register_system.register('creator');
+
+    // Create a lobby
     let (lobby_id, _) = lobby_system.create_lobby('lobby');
 
     // New players tries to join lobby one time in loop to break limit...
@@ -166,6 +208,7 @@ fn test_join_lobby_full() {
             break;
         }
         testing::set_contract_address(Felt252TryIntoContractAddress::try_into(new_player).unwrap());
+        register_system.register('new_player_' + new_player);
         lobby_system.join_lobby(lobby_id);
         new_player += 1;
     };
@@ -176,15 +219,21 @@ fn test_join_lobby_full() {
 #[test]
 #[available_gas(300000000)]
 fn test_leave_lobby() {
-    let (creator_address, world, lobby_system) = setup();
+    let (creator_address, world, register_system, lobby_system) = setup();
+
+    // Register a profile
+    testing::set_contract_address(creator_address);
+    register_system.register('creator');
 
     // Create a lobby
-    testing::set_contract_address(creator_address);
     let (lobby_id, _) = lobby_system.create_lobby('lobby');
 
-    // New player joins lobby
+    // New player register a profile
     let new_player: ContractAddress = contract_address_const::<'satoshi'>();
     testing::set_contract_address(new_player);
+    register_system.register('satoshi');
+
+    // And tries to join lobby ...
     lobby_system.join_lobby(lobby_id);
 
     // & then leaves lobby
@@ -206,11 +255,12 @@ fn test_leave_lobby() {
 #[available_gas(300000000)]
 #[should_panic(expected: ('lobby doesnt exists', 'ENTRYPOINT_FAILED'))]
 fn test_leave_lobby_does_not_exists() {
-    let (creator_address, world, lobby_system) = setup();
+    let (creator_address, world, register_system, lobby_system) = setup();
 
-    // New player tries to leave a fantom lobby
+    // New player registers & tries to leave a fantom lobby
     let new_player: ContractAddress = contract_address_const::<'satoshi'>();
     testing::set_contract_address(new_player);
+    register_system.register('satoshi');
     lobby_system.leave_lobby(34567);
 }
 
@@ -218,13 +268,16 @@ fn test_leave_lobby_does_not_exists() {
 #[available_gas(300000000)]
 #[should_panic(expected: ('creator cant leave lobby', 'ENTRYPOINT_FAILED'))]
 fn test_leave_lobby_creator() {
-    let (creator_address, world, lobby_system) = setup();
+    let (creator_address, world, register_system, lobby_system) = setup();
 
-    // Create a lobby
+    // Creator registers ...
     testing::set_contract_address(creator_address);
+    register_system.register('creator');
+
+    // ... & create a lobby ...
     let (lobby_id, _) = lobby_system.create_lobby('lobby');
 
-    // and try to leave it...
+    // ... & try to leave it
     lobby_system.leave_lobby(lobby_id);
 }
 
@@ -232,15 +285,19 @@ fn test_leave_lobby_creator() {
 #[available_gas(300000000)]
 #[should_panic(expected: ('caller not in lobby', 'ENTRYPOINT_FAILED'))]
 fn test_leave_lobby_not_inside() {
-    let (creator_address, world, lobby_system) = setup();
+    let (creator_address, world, register_system, lobby_system) = setup();
 
-    // Create a lobby
+    // Creator registers ...
     testing::set_contract_address(creator_address);
+    register_system.register('creator');
+
+    // ... & create a lobby ...
     let (lobby_id, _) = lobby_system.create_lobby('lobby');
 
-    // New player tries to leave the lobby
+    // New player register & tries to leave the lobby
     let new_player: ContractAddress = contract_address_const::<'satoshi'>();
     testing::set_contract_address(new_player);
+    register_system.register('satoshi');
     lobby_system.leave_lobby(lobby_id);
 }
 
@@ -249,10 +306,13 @@ fn test_leave_lobby_not_inside() {
 #[test]
 #[available_gas(300000000)]
 fn test_open_lobby() {
-    let (creator_address, world, lobby_system) = setup();
+    let (creator_address, world, register_system, lobby_system) = setup();
 
-    // Create a lobby
+    // Creator registers ...
     testing::set_contract_address(creator_address);
+    register_system.register('creator');
+
+    // ... & create a lobby ...
     let (lobby_id, _) = lobby_system.create_lobby('lobby');
 
     // Close it
@@ -271,9 +331,13 @@ fn test_open_lobby() {
 #[available_gas(300000000)]
 #[should_panic(expected: ('lobby doesnt exists', 'ENTRYPOINT_FAILED'))]
 fn test_open_lobby_does_not_exists() {
-    let (creator_address, world, lobby_system) = setup();
+    let (creator_address, world, register_system, lobby_system) = setup();
 
-    // Open an unknown lobby
+    // Creator registers ...
+    testing::set_contract_address(creator_address);
+    register_system.register('creator');
+
+    // .... & open an unknown lobby
     lobby_system.open_lobby(45657645);
 }
 
@@ -281,15 +345,19 @@ fn test_open_lobby_does_not_exists() {
 #[available_gas(300000000)]
 #[should_panic(expected: ('insufficient rights', 'ENTRYPOINT_FAILED'))]
 fn test_open_lobby_not_enough_rights() {
-    let (creator_address, world, lobby_system) = setup();
+    let (creator_address, world, register_system, lobby_system) = setup();
 
-    // Create a lobby
+    // Creator registers ...
     testing::set_contract_address(creator_address);
+    register_system.register('creator');
+
+    // ... & create a lobby ...
     let (lobby_id, _) = lobby_system.create_lobby('lobby');
 
     // New player joins lobby
     let new_player: ContractAddress = contract_address_const::<'satoshi'>();
     testing::set_contract_address(new_player);
+    register_system.register('satoshi');
     lobby_system.join_lobby(lobby_id);
 
     // Admin close lobby
@@ -305,13 +373,16 @@ fn test_open_lobby_not_enough_rights() {
 #[available_gas(300000000)]
 #[should_panic(expected: ('lobby is already open', 'ENTRYPOINT_FAILED'))]
 fn test_open_lobby_already_open() {
-    let (creator_address, world, lobby_system) = setup();
+    let (creator_address, world, register_system, lobby_system) = setup();
+
+    // Creator registers ...
+    testing::set_contract_address(creator_address);
+    register_system.register('creator');
 
     // Create a lobby
-    testing::set_contract_address(creator_address);
     let (lobby_id, _) = lobby_system.create_lobby('lobby');
 
-    // And try to open it
+    // And try to open it despite it being already open
     lobby_system.open_lobby(lobby_id);
 }
 
@@ -320,10 +391,13 @@ fn test_open_lobby_already_open() {
 #[test]
 #[available_gas(300000000)]
 fn test_close_lobby() {
-    let (creator_address, world, lobby_system) = setup();
+    let (creator_address, world, register_system, lobby_system) = setup();
+
+    // Creator registers ...
+    testing::set_contract_address(creator_address);
+    register_system.register('creator');
 
     // Create a lobby
-    testing::set_contract_address(creator_address);
     let (lobby_id, _) = lobby_system.create_lobby('lobby');
 
     // Close it
@@ -339,9 +413,13 @@ fn test_close_lobby() {
 #[available_gas(300000000)]
 #[should_panic(expected: ('lobby doesnt exists', 'ENTRYPOINT_FAILED'))]
 fn test_close_lobby_does_not_exists() {
-    let (creator_address, world, lobby_system) = setup();
+    let (creator_address, world, register_system, lobby_system) = setup();
 
-    // Open an unknown lobby
+    // Creator registers ...
+    testing::set_contract_address(creator_address);
+    register_system.register('creator');
+
+    // Close an unknown lobby
     lobby_system.close_lobby(45657645);
 }
 
@@ -349,15 +427,19 @@ fn test_close_lobby_does_not_exists() {
 #[available_gas(300000000)]
 #[should_panic(expected: ('insufficient rights', 'ENTRYPOINT_FAILED'))]
 fn test_close_lobby_not_enough_rights() {
-    let (creator_address, world, lobby_system) = setup();
+    let (creator_address, world, register_system, lobby_system) = setup();
+
+    // Creator registers ...
+    testing::set_contract_address(creator_address);
+    register_system.register('creator');
 
     // Create a lobby
-    testing::set_contract_address(creator_address);
     let (lobby_id, _) = lobby_system.create_lobby('lobby');
 
     // New player joins lobby
     let new_player: ContractAddress = contract_address_const::<'satoshi'>();
     testing::set_contract_address(new_player);
+    register_system.register('satoshi');
     lobby_system.join_lobby(lobby_id);
 
     // and new player tries to close it
@@ -368,10 +450,13 @@ fn test_close_lobby_not_enough_rights() {
 #[available_gas(300000000)]
 #[should_panic(expected: ('lobby is already closed', 'ENTRYPOINT_FAILED'))]
 fn test_close_lobby_already_closed() {
-    let (creator_address, world, lobby_system) = setup();
+    let (creator_address, world, register_system, lobby_system) = setup();
+
+    // Creator registers ...
+    testing::set_contract_address(creator_address);
+    register_system.register('creator');
 
     // Create a lobby
-    testing::set_contract_address(creator_address);
     let (lobby_id, _) = lobby_system.create_lobby('lobby');
 
     // and close it twice
@@ -382,20 +467,33 @@ fn test_close_lobby_already_closed() {
 // *************************************************************************
 //                                 Utilities
 // *************************************************************************
-fn setup() -> (ContractAddress, IWorldDispatcher, ILobbyDispatcher) {
+fn setup() -> (ContractAddress, IWorldDispatcher, IRegisterDispatcher, ILobbyDispatcher) {
     // define caller address
-    let caller_address = contract_address_const::<'caller'>();
+    let creator_address = contract_address_const::<'caller'>();
 
     // models used
-    let mut models = array![waiter::TEST_CLASS_HASH, lobby::TEST_CLASS_HASH];
+    let mut models = array![
+        profile::TEST_CLASS_HASH, waiter::TEST_CLASS_HASH, lobby::TEST_CLASS_HASH
+    ];
 
     // deploy world
     let world = spawn_test_world(models);
 
-    // deploy system contract
+    // deploy contracts
+    let register_system = deploy_register(world);
+    let lobby_system = deploy_lobby(world);
+
+    return (creator_address, world, register_system, lobby_system);
+}
+
+fn deploy_register(world: IWorldDispatcher) -> IRegisterDispatcher {
+    let contract_address = world
+        .deploy_contract('salt', register_system::TEST_CLASS_HASH.try_into().unwrap());
+    IRegisterDispatcher { contract_address }
+}
+
+fn deploy_lobby(world: IWorldDispatcher) -> ILobbyDispatcher {
     let contract_address = world
         .deploy_contract('salt', lobby_system::TEST_CLASS_HASH.try_into().unwrap());
-    let lobby_system = ILobbyDispatcher { contract_address };
-
-    return (caller_address, world, lobby_system);
+    ILobbyDispatcher { contract_address }
 }

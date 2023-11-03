@@ -39,6 +39,7 @@ mod lobby {
     use werewolves_of_cairo::models::game::{Game, GameTrait};
     use werewolves_of_cairo::models::waiter::{Waiter, WaiterTrait};
     use werewolves_of_cairo::models::player::{Player, PlayerTrait};
+    use werewolves_of_cairo::models::profile::{Profile, ProfileTrait};
     use werewolves_of_cairo::utils::string::assert_valid_string;
     use werewolves_of_cairo::utils::contract_address::assert_address_is_not_zero;
 
@@ -102,6 +103,8 @@ mod lobby {
             assert_valid_string(lobby_name);
 
             let caller_address = get_caller_address();
+            self._assert_caller_has_profile(caller_address);
+
             let lobby_id: u32 = self.world().uuid();
 
             let creator = WaiterTrait::new(lobby_id, 0, caller_address);
@@ -127,6 +130,7 @@ mod lobby {
 
         fn join_lobby(self: @ContractState, lobby_id: u32) -> (u32, ContractAddress) {
             let caller_address = get_caller_address();
+            self._assert_caller_has_profile(caller_address);
 
             let mut lobby = get!(self.world(), lobby_id, Lobby);
             assert_address_is_not_zero(lobby.creator, 'lobby doesnt exists');
@@ -148,6 +152,7 @@ mod lobby {
 
         fn leave_lobby(self: @ContractState, lobby_id: u32) -> (u32, ContractAddress) {
             let caller_address = get_caller_address();
+            self._assert_caller_has_profile(caller_address);
 
             let mut lobby = get!(self.world(), lobby_id, Lobby);
             assert_address_is_not_zero(lobby.creator, 'lobby doesnt exists');
@@ -166,6 +171,7 @@ mod lobby {
 
         fn open_lobby(self: @ContractState, lobby_id: u32) -> (u32, ContractAddress) {
             let caller_address = get_caller_address();
+            self._assert_caller_has_profile(caller_address);
 
             let mut lobby = get!(self.world(), lobby_id, Lobby);
             assert_address_is_not_zero(lobby.creator, 'lobby doesnt exists');
@@ -180,6 +186,7 @@ mod lobby {
 
         fn close_lobby(self: @ContractState, lobby_id: u32) -> (u32, ContractAddress) {
             let caller_address = get_caller_address();
+            self._assert_caller_has_profile(caller_address);
 
             let mut lobby = get!(self.world(), lobby_id, Lobby);
             assert_address_is_not_zero(lobby.creator, 'lobby doesnt exists');
@@ -217,6 +224,11 @@ mod lobby {
                 waiter_index += 1;
             };
             return (found_waiter, waiter_option);
+        }
+
+        fn _assert_caller_has_profile(self: @ContractState, caller_address: ContractAddress) {
+            let profile: Profile = get!(self.world(), caller_address, Profile);
+            assert(profile.user_name != 0, 'caller have no profile');
         }
     }
 }
