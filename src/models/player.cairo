@@ -1,8 +1,11 @@
+use traits::Default;
 use starknet::{ContractAddress, contract_address_const};
 use dojo::database::schema::{
     Enum, Member, Ty, Struct, SchemaIntrospection, serialize_member, serialize_member_type
 };
+
 use werewolves_of_cairo::entities::role::Role;
+use werewolves_of_cairo::entities::player_actions::{PlayerActions, DefaultPlayerActions};
 
 // *************************************************************************
 //                                   Model
@@ -14,10 +17,10 @@ struct Player {
     game_id: u32,
     #[key]
     index: usize,
-    player_id: ContractAddress,
-    player_status: PlayerStatus,
-    player_role: Role,
-    vote_for: ContractAddress
+    player_address: ContractAddress,
+    status: PlayerStatus,
+    role: Role,
+    actions: PlayerActions
 }
 
 // *************************************************************************
@@ -40,11 +43,10 @@ impl PlayerImpl of PlayerTrait {
         Player {
             game_id,
             index,
-            player_id: caller_address,
-            player_status: PlayerStatus::Alive(()),
-            // TODO: randomly determine role
-            player_role: role,
-            vote_for: contract_address_const::<0>()
+            player_address: caller_address,
+            status: PlayerStatus::Alive(()),
+            role: role,
+            actions: Default::default()
         }
     }
 }

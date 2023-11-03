@@ -1,4 +1,4 @@
-use starknet::ContractAddress;
+use starknet::{ContractAddress, contract_address_const};
 use dojo::database::schema::{
     Enum, Member, Ty, Struct, SchemaIntrospection, serialize_member, serialize_member_type
 };
@@ -17,9 +17,16 @@ struct Game {
     start_time: u64,
     is_active: bool,
     num_players: usize,
-    current_day: u32,
-    // ------------------
-    designed_lovers: (u32, u32)
+    // ------- current phase -------
+    day_current: u32,
+    is_night: bool,
+    // ------- game parameters -------
+    /// [Cupido]
+    /// If Cupido selects two lovers, their IDs are stored here
+    designed_lovers: (ContractAddress, ContractAddress),
+    /// [Witch]
+    /// Once per game, the witch can save someone that was supposed to die
+    witch_can_save: bool
 }
 
 // *************************************************************************
@@ -49,14 +56,15 @@ impl GameImpl of GameTrait {
             start_time: start_time,
             is_active: true,
             num_players: num_players,
-            current_day: 0,
-            designed_lovers: (0, 0)
+            day_current: 0,
+            is_night: true,
+            designed_lovers: (contract_address_const::<0>(), contract_address_const::<0>()),
+            witch_can_save: true
         }
     }
 }
 
-
-impl DesignedLoversIntrospectionImpl of SchemaIntrospection<(u32, u32)> {
+impl DesignedLoversIntrospectionImpl of SchemaIntrospection<(ContractAddress, ContractAddress)> {
     #[inline(always)]
     fn size() -> usize {
         1

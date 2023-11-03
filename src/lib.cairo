@@ -5,6 +5,7 @@ mod data {
 mod entities {
     mod role;
     mod randomizer;
+    mod player_actions;
 }
 mod models {
     mod profile;

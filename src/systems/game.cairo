@@ -87,6 +87,7 @@ mod lobby {
             (game_id, caller_address)
         }
     }
+
     #[generate_trait]
     impl InternalImpl of InternalTrait {
         fn _create_players_from_lobby(self: @ContractState, lobby: Lobby, game_id: u32) {

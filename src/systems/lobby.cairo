@@ -88,13 +88,13 @@ mod lobby {
     #[derive(Drop, starknet::Event)]
     struct PlayerJoinedLobby {
         lobby_id: u32,
-        player_id: ContractAddress,
+        player_address: ContractAddress,
     }
 
     #[derive(Drop, starknet::Event)]
     struct PlayerLeftLobby {
         lobby_id: u32,
-        player_id: ContractAddress,
+        player_address: ContractAddress,
     }
 
     #[external(v0)]
@@ -123,7 +123,7 @@ mod lobby {
                     max_players: lobby.max_players
                 }
             );
-            emit!(self.world(), PlayerJoinedLobby { lobby_id, player_id: caller_address });
+            emit!(self.world(), PlayerJoinedLobby { lobby_id, player_address: caller_address });
 
             (lobby_id, caller_address)
         }
@@ -146,7 +146,7 @@ mod lobby {
             lobby.num_players = lobby.num_players + 1;
 
             set!(self.world(), (lobby, new_waiter));
-            emit!(self.world(), PlayerJoinedLobby { lobby_id, player_id: caller_address });
+            emit!(self.world(), PlayerJoinedLobby { lobby_id, player_address: caller_address });
             (lobby_id, caller_address)
         }
 
@@ -165,7 +165,7 @@ mod lobby {
             lobby.num_players = lobby.num_players - 1;
 
             set!(self.world(), (lobby, waiter));
-            emit!(self.world(), PlayerLeftLobby { lobby_id, player_id: caller_address });
+            emit!(self.world(), PlayerLeftLobby { lobby_id, player_address: caller_address });
             (lobby_id, caller_address)
         }
 
