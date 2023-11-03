@@ -2,12 +2,14 @@ mod constants;
 mod data {
     mod compositions;
 }
+mod entities {
+    mod role;
+}
 mod models {
     mod waiter;
     mod player;
     mod lobby;
     mod game;
-    mod role;
 }
 mod systems {
     mod lobby;

@@ -25,7 +25,7 @@ mod lobby {
     use werewolves_of_cairo::models::game::{Game, GameTrait};
     use werewolves_of_cairo::models::waiter::{Waiter, WaiterTrait};
     use werewolves_of_cairo::models::player::{Player, PlayerTrait, PlayerStatus};
-    use werewolves_of_cairo::models::role::{RoleEnum};
+    use werewolves_of_cairo::entities::role::RoleEnum;
     use werewolves_of_cairo::utils::string::assert_valid_string;
 
     use super::IGame;

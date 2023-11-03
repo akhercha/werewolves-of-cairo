@@ -2,7 +2,7 @@ use starknet::{ContractAddress, contract_address_const};
 use dojo::database::schema::{
     Enum, Member, Ty, Struct, SchemaIntrospection, serialize_member, serialize_member_type
 };
-use werewolves_of_cairo::models::role::RoleEnum;
+use werewolves_of_cairo::entities::role::RoleEnum;
 
 // *************************************************************************
 //                                   Model
