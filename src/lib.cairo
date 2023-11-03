@@ -4,6 +4,7 @@ mod data {
 }
 mod entities {
     mod role;
+    mod randomizer;
 }
 mod models {
     mod waiter;
@@ -25,6 +26,9 @@ mod utils {
 
 #[cfg(test)]
 mod tests {
+    mod entities {
+        mod test_randomizer;
+    }
     mod models {
         mod test_waiter;
     }

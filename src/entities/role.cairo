@@ -3,7 +3,7 @@ use dojo::database::schema::{
     Enum, Member, Ty, Struct, SchemaIntrospection, serialize_member, serialize_member_type
 };
 
-use werewolves_of_cairo::utils::random::{RandomizerTrait};
+use werewolves_of_cairo::utils::random::random;
 
 struct Role {}
 
@@ -108,7 +108,7 @@ impl RoleImpl of RoleTrait {
 
     fn random() -> RoleEnum {
         let roles = RoleImpl::all();
-        let index = RandomizerTrait::quick_random(0, roles.len().into());
+        let index = random(0, roles.len().into());
 
         *roles.at(index.try_into().unwrap())
     }
