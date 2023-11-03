@@ -203,18 +203,18 @@ mod lobby {
             let mut found_waiter: bool = false;
             let mut waiter_option: Option = Option::None(());
 
-            let mut waiter_idx: u32 = 1;
+            let mut waiter_index: u32 = 1;
             loop {
-                if (waiter_idx >= max_waiter_id) {
+                if (waiter_index >= max_waiter_id) {
                     break;
                 }
-                let waiter = get!(self.world(), (lobby_id, waiter_idx), Waiter);
+                let waiter = get!(self.world(), (lobby_id, waiter_index), Waiter);
                 assert_address_is_not_zero(waiter.waiter_id, 'waiter should have addr');
                 if (waiter.is_waiting && waiter.waiter_id == caller) {
                     found_waiter = true;
                     waiter_option = Option::Some(waiter);
                 }
-                waiter_idx += 1;
+                waiter_index += 1;
             };
             return (found_waiter, waiter_option);
         }

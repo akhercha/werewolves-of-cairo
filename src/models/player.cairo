@@ -36,14 +36,14 @@ enum PlayerStatus {
 
 #[generate_trait]
 impl PlayerImpl of PlayerTrait {
-    fn new(game_id: u32, index: usize, caller_address: ContractAddress) -> Player {
+    fn new(game_id: u32, index: usize, caller_address: ContractAddress, role: Role) -> Player {
         Player {
             game_id,
             index,
             player_id: caller_address,
             player_status: PlayerStatus::Alive(()),
             // TODO: randomly determine role
-            player_role: Role::Townfolk,
+            player_role: role,
             vote_for: contract_address_const::<0>()
         }
     }
