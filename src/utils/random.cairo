@@ -1,3 +1,4 @@
+// TODO: implement proper pseudo random number generator
 #[derive(Drop)]
 struct Randomizer {
     nonce: felt252
@@ -13,7 +14,6 @@ impl RandomizerImpl of RandomizerTrait {
         Randomizer { nonce }
     }
 
-    // TODO: implement proper pseudo random number generator
     fn random_by_seed(ref self: Randomizer, seed: felt252, min: u128, max: u128) -> u128 {
         if min >= max {
             panic_with_felt252('min >= max');
@@ -27,7 +27,6 @@ impl RandomizerImpl of RandomizerTrait {
         (seed.low % range) + min
     }
 
-    // TODO: implement proper pseudo random number generator
     fn random(ref self: Randomizer, min: u128, max: u128) -> u128 {
         if min >= max {
             panic_with_felt252('min >= max');
