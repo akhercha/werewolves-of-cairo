@@ -5,7 +5,7 @@ use werewolves_of_cairo::utils::random::{Randomizer, RandomizerTrait};
 // *************************************************************************
 
 #[test]
-#[available_gas(100000)]
+#[available_gas(300000000)]
 fn test_randomizer_init() {
     let randomizer = RandomizerTrait::new();
     assert(randomizer.nonce == 0, 'should be 0');
@@ -59,8 +59,6 @@ fn test_randomizer_random_by_seed() {
 #[test]
 #[available_gas(300000000)]
 fn test_quick_random() {
-    let mut randomizer = RandomizerTrait::new();
-
     let min: u128 = 2;
     let max: u128 = 6;
 
@@ -75,6 +73,13 @@ fn test_quick_random() {
     assert_is_in_range(RandomizerTrait::quick_random(min, max), min, max);
     assert_is_in_range(RandomizerTrait::quick_random(min, max), min, max);
     assert_is_in_range(RandomizerTrait::quick_random(min, max), min, max);
+}
+
+#[test]
+#[available_gas(300000000)]
+#[should_panic(expected: ('min >= max',))]
+fn test_quick_random_min_superior_max() {
+    RandomizerTrait::quick_random(min: 10, max: 9);
 }
 
 
