@@ -21,11 +21,12 @@ mod lobby {
     use starknet::get_block_timestamp;
     use starknet::info::get_tx_info;
 
+    use werewolves_of_cairo::data::compositions::get_comp_for_num_players;
     use werewolves_of_cairo::models::lobby::{Lobby, LobbyTrait};
     use werewolves_of_cairo::models::game::{Game, GameTrait};
     use werewolves_of_cairo::models::waiter::{Waiter, WaiterTrait};
     use werewolves_of_cairo::models::player::{Player, PlayerTrait, PlayerStatus};
-    use werewolves_of_cairo::entities::role::Role;
+    use werewolves_of_cairo::entities::role::{Role, RoleTrait};
     use werewolves_of_cairo::utils::string::assert_valid_string;
     use werewolves_of_cairo::utils::contract_address::assert_address_is_not_zero;
 
@@ -69,30 +70,8 @@ mod lobby {
             let game_id = self.world().uuid();
             let start_time = get_block_timestamp();
 
-            // create players for each waiters for the game
-            let mut waiter_idx: u32 = 0;
-            loop {
-                // Quit loop if all waiters have been traversed
-                if (waiter_idx >= lobby.waiter_next_id) {
-                    break;
-                }
-
-                // Check next waiter
-                let mut waiter = get!(self.world(), (lobby.lobby_id, waiter_idx), Waiter);
-                assert_address_is_not_zero(waiter.waiter_id, 'waiter should have addr');
-
-                // If this waiter is no longer in the lobby; ignore
-                if (!waiter.is_waiting) {
-                    continue;
-                }
-
-                // TODO: when compositions are done, assign random roles from it
-                // Create the player from the active waiter
-                let player_from_waiter = PlayerTrait::new(game_id, waiter_idx, waiter.waiter_id);
-                waiter.is_waiting = false;
-                set!(self.world(), (player_from_waiter, waiter));
-                waiter_idx += 1;
-            };
+            // create the players from the waiters in the lobby
+            self._create_players_from_lobby(lobby, game_id);
 
             // create the game if everything went well
             let game = GameTrait::new(game_id, caller_address, start_time, lobby.num_players);
@@ -101,7 +80,7 @@ mod lobby {
             emit!(
                 self.world(),
                 GameCreated {
-                    game_id, creator: caller_address, start_time, num_players: lobby.num_players
+                    game_id, creator: caller_address, start_time, num_players: game.num_players
                 }
             );
 
@@ -109,5 +88,43 @@ mod lobby {
         }
     }
     #[generate_trait]
-    impl InternalImpl of InternalTrait {}
+    impl InternalImpl of InternalTrait {
+        fn _create_players_from_lobby(self: @ContractState, lobby: Lobby, game_id: u32) {
+            // create & shuffle the roles
+            let mut roles: Span<Role> = get_comp_for_num_players(lobby.num_players);
+            let mut shuffled_roles: Span<Role> = RoleTrait::shuffle(ref roles);
+
+            // traversal indexes
+            let mut waiter_index: u32 = 0;
+            let mut player_index: u32 = 0;
+
+            // create players for each waiters for the game
+            loop {
+                // Quit loop if all waiters have been traversed
+                if (waiter_index >= lobby.waiter_next_id) {
+                    break;
+                }
+
+                // Check next waiter
+                let mut waiter = get!(self.world(), (lobby.lobby_id, waiter_index), Waiter);
+                assert_address_is_not_zero(waiter.waiter_id, 'waiter should have addr');
+
+                // If this waiter is no longer in the lobby; ignore
+                if (!waiter.is_waiting) {
+                    waiter_index += 1;
+                    continue;
+                }
+
+                // Create the player from the active waiter
+                let player_role = shuffled_roles.pop_front().expect('role shouldnt be None');
+                let player_from_waiter = PlayerTrait::new(
+                    game_id, player_index, waiter.waiter_id, *player_role
+                );
+                waiter.is_waiting = false;
+                set!(self.world(), (player_from_waiter, waiter));
+                waiter_index += 1;
+                player_index += 1;
+            };
+        }
+    }
 }

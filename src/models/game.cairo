@@ -18,6 +18,7 @@ struct Game {
     is_active: bool,
     num_players: usize,
     current_day: u32,
+    // ------------------
     designed_lovers: (u32, u32)
 }
 
