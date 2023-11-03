@@ -26,7 +26,7 @@ fn test_random() {
 #[test]
 #[available_gas(300000000)]
 #[should_panic(expected: ('min >= max',))]
-fn test_quick_random_min_superior_max() {
+fn test_random_min_superior_max() {
     random(min: 10, max: 9);
 }
 
