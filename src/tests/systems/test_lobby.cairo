@@ -77,7 +77,7 @@ fn test_join_lobby() {
     let waiter = get!(world, (lobby_id, 1), Waiter);
     assert(waiter.lobby_id == lobby_id, 'should be lobby_id');
     assert(waiter.waiter_id == new_player, 'should be new player');
-    assert(waiter.has_left_lobby == false, 'should be in lobby');
+    assert(waiter.is_waiting == true, 'should be in lobby');
 
     // Check lobby new world state
     let lobby: Lobby = get!(world, lobby_id, Lobby);
@@ -199,7 +199,7 @@ fn test_leave_lobby() {
     let waiter = get!(world, (lobby_id, 1), Waiter);
     assert(waiter.lobby_id == lobby_id, 'should be lobby_id');
     assert(waiter.waiter_id == new_player, 'should be new player');
-    assert(waiter.has_left_lobby == true, 'should have leave lobby');
+    assert(waiter.is_waiting == false, 'should have leave lobby');
 }
 
 #[test]

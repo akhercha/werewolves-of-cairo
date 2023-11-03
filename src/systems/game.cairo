@@ -27,7 +27,7 @@ mod lobby {
     use werewolves_of_cairo::models::player::{Player, PlayerTrait, PlayerStatus};
     use werewolves_of_cairo::entities::role::Role;
     use werewolves_of_cairo::utils::string::assert_valid_string;
-    use werewolves_of_cairo::utils::contract_address::assert_address_is_not_null;
+    use werewolves_of_cairo::utils::contract_address::assert_address_is_not_zero;
 
     use super::IGame;
 
@@ -62,7 +62,7 @@ mod lobby {
             let caller_address = get_caller_address();
             let lobby = get!(self.world(), lobby_id, Lobby);
 
-            assert_address_is_not_null(lobby.creator, 'lobby doesnt exists');
+            assert_address_is_not_zero(lobby.creator, 'lobby doesnt exists');
             assert(lobby.creator == caller_address, 'insufficient rights');
             assert(lobby.can_start(), 'cant start game');
 
@@ -78,18 +78,19 @@ mod lobby {
                 }
 
                 // Check next waiter
-                let waiter = get!(self.world(), (lobby.lobby_id, waiter_idx), Waiter);
-                assert_address_is_not_null(waiter.waiter_id, 'waiter should have addr');
+                let mut waiter = get!(self.world(), (lobby.lobby_id, waiter_idx), Waiter);
+                assert_address_is_not_zero(waiter.waiter_id, 'waiter should have addr');
 
                 // If this waiter is no longer in the lobby; ignore
-                if (waiter.has_left_lobby) {
+                if (!waiter.is_waiting) {
                     continue;
                 }
 
                 // TODO: when compositions are done, assign random roles from it
                 // Create the player from the active waiter
                 let player_from_waiter = PlayerTrait::new(game_id, waiter_idx, waiter.waiter_id);
-                set!(self.world(), (player_from_waiter));
+                waiter.is_waiting = false;
+                set!(self.world(), (player_from_waiter, waiter));
                 waiter_idx += 1;
             };
 

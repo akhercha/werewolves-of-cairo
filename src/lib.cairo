@@ -29,6 +29,7 @@ mod utils {
 mod tests {
     mod entities {
         mod test_randomizer;
+        mod test_role;
     }
     mod models {
         mod test_waiter;

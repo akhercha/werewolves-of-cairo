@@ -18,6 +18,7 @@ struct Game {
     is_active: bool,
     num_players: usize,
     current_day: u32,
+    designed_lovers: (u32, u32)
 }
 
 // *************************************************************************
@@ -47,7 +48,35 @@ impl GameImpl of GameTrait {
             start_time: start_time,
             is_active: true,
             num_players: num_players,
-            current_day: 0
+            current_day: 0,
+            designed_lovers: (0, 0)
         }
+    }
+}
+
+
+impl DesignedLoversIntrospectionImpl of SchemaIntrospection<(u32, u32)> {
+    #[inline(always)]
+    fn size() -> usize {
+        1
+    }
+
+    #[inline(always)]
+    fn layout(ref layout: Array<u8>) {
+        layout.append(8);
+    }
+
+    #[inline(always)]
+    fn ty() -> Ty {
+        Ty::Enum(
+            Enum {
+                name: 'DesignedLovers',
+                attrs: array![].span(),
+                children: array![
+                    ('DesignedLovers', serialize_member_type(@Ty::Tuple(array![].span()))),
+                ]
+                    .span()
+            }
+        )
     }
 }

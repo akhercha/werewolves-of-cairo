@@ -3,6 +3,7 @@ use dojo::database::schema::{
     Enum, Member, Ty, Struct, SchemaIntrospection, serialize_member, serialize_member_type
 };
 
+use werewolves_of_cairo::entities::randomizer::{Randomizer, RandomizerTrait};
 use werewolves_of_cairo::utils::random::random;
 
 const NBR_OF_ROLES: usize = 8;
@@ -12,8 +13,14 @@ enum Role {
     Townfolk, // 0
     Werewolf, // 1
     FortuneTeller, // 2
+    /// LittleGirl:
+    ///
+    /// can take the risk to read the wolves chat; but has 20% chance of dying
     LittleGirl, // 3
     Witch, // 4
+    /// Thief:
+    ///
+    /// can swap his card with another player once during the game
     Thief, // 5
     Hunter, // 6
     Cupido, // 7
@@ -41,6 +48,33 @@ impl RoleImpl of RoleTrait {
 
         *roles.at(index.try_into().unwrap())
     }
+
+    fn shuffle(ref roles: Span<Role>) -> Span<Role> {
+        let mut randomizer: Randomizer = RandomizerTrait::new();
+        let mut shuffled_roles: Array<Role> = array![];
+        loop {
+            if (roles.len() <= 0) {
+                break;
+            }
+
+            let is_back: bool = randomizer.random(0, 2).into();
+            let item = if is_back {
+                roles.pop_back().unwrap()
+            } else {
+                roles.pop_front().unwrap()
+            };
+            shuffled_roles.append(*item);
+        };
+        shuffled_roles.span()
+    }
+
+    fn first_night_only() -> Span<Role> {
+        array![Role::Thief, Role::Cupido,].span()
+    }
+
+    fn play_order_during_night() -> Span<Role> {
+        array![Role::Werewolf, Role::FortuneTeller, Role::Witch, Role::LittleGirl,].span()
+    }
 }
 
 impl RoleIntoFelt252 of Into<Role, felt252> {
@@ -60,6 +94,21 @@ impl RoleIntoFelt252 of Into<Role, felt252> {
 
 impl RoleIntoU8 of Into<Role, u8> {
     fn into(self: Role) -> u8 {
+        match self {
+            Role::Townfolk => 0,
+            Role::Werewolf => 1,
+            Role::FortuneTeller => 2,
+            Role::LittleGirl => 3,
+            Role::Witch => 4,
+            Role::Thief => 5,
+            Role::Hunter => 6,
+            Role::Cupido => 7,
+        }
+    }
+}
+
+impl RoleIntoU32 of Into<Role, u32> {
+    fn into(self: Role) -> u32 {
         match self {
             Role::Townfolk => 0,
             Role::Werewolf => 1,
@@ -110,5 +159,15 @@ impl RoleIntrospectionImpl of SchemaIntrospection<Role> {
                     .span()
             }
         )
+    }
+}
+
+// *************************************************************************
+//                               Utilities
+// *************************************************************************
+
+impl U128IntoBool of Into<u128, bool> {
+    fn into(self: u128) -> bool {
+        self > 0
     }
 }

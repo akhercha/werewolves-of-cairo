@@ -14,7 +14,7 @@ struct Waiter {
     #[key]
     index: usize,
     waiter_id: ContractAddress,
-    has_left_lobby: bool
+    is_waiting: bool
 }
 
 // *************************************************************************
@@ -24,6 +24,6 @@ struct Waiter {
 #[generate_trait]
 impl WaiterImpl of WaiterTrait {
     fn new(lobby_id: u32, index: usize, waiter_id: ContractAddress) -> Waiter {
-        Waiter { lobby_id, index, waiter_id, has_left_lobby: false }
+        Waiter { lobby_id, index, waiter_id, is_waiting: true }
     }
 }
