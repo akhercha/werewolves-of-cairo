@@ -20,6 +20,7 @@ mod utils {
     mod random;
     mod settings;
     mod string;
+    mod contract_address;
 }
 
 // Tests

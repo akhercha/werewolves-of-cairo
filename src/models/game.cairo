@@ -17,6 +17,7 @@ struct Game {
     start_time: u64,
     is_active: bool,
     num_players: usize,
+    current_day: u32,
 }
 
 // *************************************************************************
@@ -45,7 +46,8 @@ impl GameImpl of GameTrait {
             creator: creator,
             start_time: start_time,
             is_active: true,
-            num_players: num_players
+            num_players: num_players,
+            current_day: 0
         }
     }
 }

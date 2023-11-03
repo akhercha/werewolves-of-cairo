@@ -30,7 +30,7 @@ trait ILobby<TContractState> {
 
 #[dojo::contract]
 mod lobby {
-    use starknet::{ContractAddress, contract_address_const};
+    use starknet::ContractAddress;
     use starknet::get_caller_address;
     use starknet::get_block_timestamp;
     use starknet::info::get_tx_info;
@@ -40,6 +40,7 @@ mod lobby {
     use werewolves_of_cairo::models::waiter::{Waiter, WaiterTrait};
     use werewolves_of_cairo::models::player::{Player, PlayerTrait};
     use werewolves_of_cairo::utils::string::assert_valid_string;
+    use werewolves_of_cairo::utils::contract_address::assert_address_is_not_null;
 
     use super::ILobby;
 
@@ -128,7 +129,7 @@ mod lobby {
             let caller_address = get_caller_address();
 
             let mut lobby = get!(self.world(), lobby_id, Lobby);
-            assert(lobby.creator != contract_address_const::<0>(), 'lobby doesnt exists');
+            assert_address_is_not_null(lobby.creator, 'lobby doesnt exists');
             assert(lobby.creator != caller_address, 'creator cant join lobby');
             assert(lobby.is_open, 'lobby isnt open');
             assert(lobby.num_players < lobby.max_players, 'lobby is full');
@@ -149,7 +150,7 @@ mod lobby {
             let caller_address = get_caller_address();
 
             let mut lobby = get!(self.world(), lobby_id, Lobby);
-            assert(lobby.creator != contract_address_const::<0>(), 'lobby doesnt exists');
+            assert_address_is_not_null(lobby.creator, 'lobby doesnt exists');
             assert(lobby.creator != caller_address, 'creator cant leave lobby');
             let (is_in_lobby, waiter) = self._is_in_lobby(caller_address, lobby);
             assert(is_in_lobby, 'caller not in lobby');
@@ -167,7 +168,7 @@ mod lobby {
             let caller_address = get_caller_address();
 
             let mut lobby = get!(self.world(), lobby_id, Lobby);
-            assert(lobby.creator != contract_address_const::<0>(), 'lobby doesnt exists');
+            assert_address_is_not_null(lobby.creator, 'lobby doesnt exists');
             assert(lobby.creator == caller_address, 'insufficient rights');
             assert(!lobby.is_open, 'lobby is already open');
 
@@ -181,7 +182,7 @@ mod lobby {
             let caller_address = get_caller_address();
 
             let mut lobby = get!(self.world(), lobby_id, Lobby);
-            assert(lobby.creator != contract_address_const::<0>(), 'lobby doesnt exists');
+            assert_address_is_not_null(lobby.creator, 'lobby doesnt exists');
             assert(lobby.creator == caller_address, 'insufficient rights');
             assert(lobby.is_open, 'lobby is already closed');
 
@@ -208,9 +209,7 @@ mod lobby {
                     break;
                 }
                 let waiter = get!(self.world(), (lobby_id, waiter_idx), Waiter);
-                assert(
-                    waiter.waiter_id != contract_address_const::<0>(), 'waiter should have addr'
-                );
+                assert_address_is_not_null(waiter.waiter_id, 'waiter should have addr');
                 if (!waiter.has_left_lobby && waiter.waiter_id == caller) {
                     found_waiter = true;
                     waiter_option = Option::Some(waiter);

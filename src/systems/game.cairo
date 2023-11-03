@@ -16,7 +16,7 @@ trait IGame<TContractState> {
 
 #[dojo::contract]
 mod lobby {
-    use starknet::{ContractAddress, contract_address_const};
+    use starknet::ContractAddress;
     use starknet::get_caller_address;
     use starknet::get_block_timestamp;
     use starknet::info::get_tx_info;
@@ -27,6 +27,7 @@ mod lobby {
     use werewolves_of_cairo::models::player::{Player, PlayerTrait, PlayerStatus};
     use werewolves_of_cairo::entities::role::Role;
     use werewolves_of_cairo::utils::string::assert_valid_string;
+    use werewolves_of_cairo::utils::contract_address::assert_address_is_not_null;
 
     use super::IGame;
 
@@ -61,7 +62,7 @@ mod lobby {
             let caller_address = get_caller_address();
             let lobby = get!(self.world(), lobby_id, Lobby);
 
-            assert(lobby.creator != contract_address_const::<0>(), 'lobby doesnt exists');
+            assert_address_is_not_null(lobby.creator, 'lobby doesnt exists');
             assert(lobby.creator == caller_address, 'insufficient rights');
             assert(lobby.can_start(), 'cant start game');
 
@@ -71,14 +72,22 @@ mod lobby {
             // create players for each waiters for the game
             let mut waiter_idx: u32 = 0;
             loop {
+                // Quit loop if all waiters have been traversed
                 if (waiter_idx >= lobby.waiter_next_id) {
                     break;
                 }
-                let waiter = get!(self.world(), (lobby.lobby_id, waiter_idx), Waiter);
-                assert(
-                    waiter.waiter_id != contract_address_const::<0>(), 'waiter should have addr'
-                );
 
+                // Check next waiter
+                let waiter = get!(self.world(), (lobby.lobby_id, waiter_idx), Waiter);
+                assert_address_is_not_null(waiter.waiter_id, 'waiter should have addr');
+
+                // If this waiter is no longer in the lobby; ignore
+                if (waiter.has_left_lobby) {
+                    continue;
+                }
+
+                // TODO: when compositions are done, assign random roles from it
+                // Create the player from the active waiter
                 let player_from_waiter = PlayerTrait::new(game_id, waiter_idx, waiter.waiter_id);
                 set!(self.world(), (player_from_waiter));
                 waiter_idx += 1;
