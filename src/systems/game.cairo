@@ -21,7 +21,6 @@ mod lobby {
     use starknet::get_block_timestamp;
     use starknet::info::get_tx_info;
 
-    use werewolves_of_cairo::data::compositions::get_comp_for_num_players;
     use werewolves_of_cairo::models::lobby::{Lobby, LobbyTrait};
     use werewolves_of_cairo::models::game::{Game, GameTrait};
     use werewolves_of_cairo::models::waiter::{Waiter, WaiterTrait};
@@ -92,7 +91,7 @@ mod lobby {
     impl InternalImpl of InternalTrait {
         fn _create_players_from_lobby(self: @ContractState, lobby: Lobby, game_id: u32) {
             // create & shuffle the roles
-            let mut roles: Span<Role> = get_comp_for_num_players(lobby.num_players);
+            let mut roles: Span<Role> = RoleTrait::composition_for(lobby.num_players);
             let mut shuffled_roles: Span<Role> = RoleTrait::shuffle(ref roles);
 
             // traversal indexes

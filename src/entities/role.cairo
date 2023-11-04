@@ -3,6 +3,7 @@ use dojo::database::schema::{
     Enum, Member, Ty, Struct, SchemaIntrospection, serialize_member, serialize_member_type
 };
 
+use werewolves_of_cairo::data::compositions::get_comp_for_num_players;
 use werewolves_of_cairo::entities::randomizer::{Randomizer, RandomizerTrait};
 use werewolves_of_cairo::utils::random::random;
 
@@ -47,6 +48,10 @@ impl RoleImpl of RoleTrait {
         let index = random(0, roles.len().into());
 
         *roles.at(index.try_into().unwrap())
+    }
+
+    fn composition_for(nb_players: usize) -> Span<Role> {
+        get_comp_for_num_players(nb_players)
     }
 
     fn shuffle(ref roles: Span<Role>) -> Span<Role> {
