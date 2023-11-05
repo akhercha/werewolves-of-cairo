@@ -1,3 +1,7 @@
+fn get_seed() -> felt252 {
+    starknet::get_tx_info().unbox().transaction_hash
+}
+
 // TODO: implement proper pseudo random number generator
 #[derive(Drop)]
 struct Randomizer {
@@ -39,10 +43,6 @@ impl RandomizerImpl of RandomizerTrait {
 
         (seed.low % range) + min
     }
-}
-
-fn get_seed() -> felt252 {
-    starknet::get_tx_info().unbox().transaction_hash
 }
 
 fn random(min: u128, max: u128) -> u128 {

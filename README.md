@@ -4,6 +4,8 @@ Recreation of the game Werewolves of Millers Hollow on the Starknet blockchain u
 
 [[Architecture documentation]](docs/architecture.md)
 
+[[Figma folder]](https://www.figma.com/files/project/115049883/Werwolves-of-Cairo?fuid=1049275643167208739)
+
 ## Get started
 
 ```bash
