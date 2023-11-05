@@ -4,7 +4,7 @@ mod data {
 }
 mod entities {
     mod role;
-    mod randomizer;
+    mod player_actions;
 }
 mod models {
     mod profile;
@@ -16,7 +16,7 @@ mod models {
 mod systems {
     mod lobby;
     mod game;
-    mod register;
+    mod profile;
 }
 mod utils {
     mod random;
@@ -30,7 +30,6 @@ mod utils {
 #[cfg(test)]
 mod tests {
     mod entities {
-        mod test_randomizer;
         mod test_role;
     }
     mod models {
@@ -38,7 +37,7 @@ mod tests {
     }
     mod systems {
         mod test_lobby;
-        mod test_register;
+        mod test_profile;
     }
     mod test_utils;
 }

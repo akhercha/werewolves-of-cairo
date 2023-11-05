@@ -5,9 +5,9 @@ use starknet::ContractAddress;
 // *************************************************************************
 
 #[starknet::interface]
-trait IRegister<TContractState> {
-    // Create a new lobby
-    fn register(self: @TContractState, user_name: felt252) -> ContractAddress;
+trait IProfile<TContractState> {
+    // Register a new profile
+    fn register(self: @TContractState, user_name: felt252) -> (ContractAddress, felt252);
 }
 
 // *************************************************************************
@@ -15,16 +15,14 @@ trait IRegister<TContractState> {
 // *************************************************************************
 
 #[dojo::contract]
-mod register {
-    use starknet::ContractAddress;
-    use starknet::get_caller_address;
-    use starknet::get_block_timestamp;
+mod profile {
+    use starknet::{ContractAddress, get_caller_address, get_block_timestamp};
     use starknet::info::get_tx_info;
 
     use werewolves_of_cairo::models::profile::{Profile, ProfileTrait};
     use werewolves_of_cairo::utils::string::assert_valid_string;
 
-    use super::IRegister;
+    use super::IProfile;
 
     #[starknet::interface]
     trait ISystem<TContractState> {
@@ -50,8 +48,8 @@ mod register {
     }
 
     #[external(v0)]
-    impl LobbyImpl of IRegister<ContractState> {
-        fn register(self: @ContractState, user_name: felt252) -> ContractAddress {
+    impl LobbyImpl of IProfile<ContractState> {
+        fn register(self: @ContractState, user_name: felt252) -> (ContractAddress, felt252) {
             let caller: ContractAddress = get_caller_address();
 
             // Check if the caller does not have a profile already
@@ -65,7 +63,7 @@ mod register {
             let new_profile: Profile = ProfileTrait::new(caller, user_name);
             set!(self.world(), (new_profile));
             emit!(self.world(), ProfileRegistered { user_id: caller, name: user_name });
-            return caller;
+            return (caller, user_name);
         }
     }
 }

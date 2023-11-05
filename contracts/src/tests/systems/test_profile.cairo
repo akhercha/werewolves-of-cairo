@@ -6,8 +6,8 @@ use dojo::test_utils::{spawn_test_world, deploy_contract};
 
 use werewolves_of_cairo::models::profile::{profile, Profile};
 
-use werewolves_of_cairo::systems::register::{
-    IRegisterDispatcher, IRegisterDispatcherTrait, register as register_system
+use werewolves_of_cairo::systems::profile::{
+    IProfileDispatcher, IProfileDispatcherTrait, profile as profile_system
 };
 
 // *************************************************************************
@@ -19,12 +19,12 @@ use werewolves_of_cairo::systems::register::{
 #[test]
 #[available_gas(300000000)]
 fn test_register_user() {
-    let (caller_address, world, register_system) = setup();
+    let (caller_address, world, profile_system) = setup();
     testing::set_contract_address(caller_address);
 
     // register new profile from address
     let user_name: felt252 = 'adel';
-    register_system.register(user_name);
+    profile_system.register(user_name);
 
     // check new profile
     let profile: Profile = get!(world, caller_address, Profile);
@@ -35,31 +35,31 @@ fn test_register_user() {
 #[available_gas(300000000)]
 #[should_panic(expected: ('profile already exists', 'ENTRYPOINT_FAILED'))]
 fn test_register_user_twice() {
-    let (caller_address, world, register_system) = setup();
+    let (caller_address, world, profile_system) = setup();
     testing::set_contract_address(caller_address);
 
     // register new profile from address
     let user_name: felt252 = 'adel';
-    register_system.register(user_name);
-    register_system.register(user_name);
+    profile_system.register(user_name);
+    profile_system.register(user_name);
 }
 
 #[test]
 #[available_gas(300000000)]
 #[should_panic(expected: ('Name too short', 'ENTRYPOINT_FAILED'))]
 fn test_register_invalid_user_name() {
-    let (caller_address, world, register_system) = setup();
+    let (caller_address, world, profile_system) = setup();
     testing::set_contract_address(caller_address);
 
     // register new profile from address
     let user_name: felt252 = 1;
-    register_system.register(user_name);
+    profile_system.register(user_name);
 }
 
 // *************************************************************************
 //                                 Utilities
 // *************************************************************************
-fn setup() -> (ContractAddress, IWorldDispatcher, IRegisterDispatcher) {
+fn setup() -> (ContractAddress, IWorldDispatcher, IProfileDispatcher) {
     // define caller address
     let caller_address = contract_address_const::<'caller'>();
 
@@ -71,8 +71,8 @@ fn setup() -> (ContractAddress, IWorldDispatcher, IRegisterDispatcher) {
 
     // deploy system contract
     let contract_address = world
-        .deploy_contract('salt', register_system::TEST_CLASS_HASH.try_into().unwrap());
-    let register_system = IRegisterDispatcher { contract_address };
+        .deploy_contract('salt', profile_system::TEST_CLASS_HASH.try_into().unwrap());
+    let profile_system = IProfileDispatcher { contract_address };
 
-    return (caller_address, world, register_system);
+    return (caller_address, world, profile_system);
 }
