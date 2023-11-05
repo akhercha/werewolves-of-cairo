@@ -53,7 +53,7 @@ enum WitchVote {
 }
 
 // *************************************************************************
-//                              Implementation
+//                             Utility traits
 // *************************************************************************
 
 impl DefaultPlayerActions of Default<PlayerActions> {
@@ -69,7 +69,6 @@ impl DefaultPlayerActions of Default<PlayerActions> {
         }
     }
 }
-
 
 // *************************************************************************
 //                           Schema Introspections

@@ -26,6 +26,10 @@ enum Role {
     Cupido, // 7
 }
 
+// *************************************************************************
+//                              Implementation
+// *************************************************************************
+
 #[generate_trait]
 impl RoleImpl of RoleTrait {
     fn all() -> Span<Role> {
@@ -60,7 +64,115 @@ impl RoleImpl of RoleTrait {
     fn play_order_specials_first_night() -> Span<Role> {
         array![Role::Thief, Role::Cupido,].span()
     }
+
+    fn is_townfolk(role: @Role) -> bool {
+        match role {
+            Role::Townfolk => true,
+            Role::Werewolf => false,
+            Role::FortuneTeller => false,
+            Role::LittleGirl => false,
+            Role::Witch => false,
+            Role::Thief => false,
+            Role::Hunter => false,
+            Role::Cupido => false
+        }
+    }
+
+    fn is_werewolf(role: @Role) -> bool {
+        match role {
+            Role::Townfolk => false,
+            Role::Werewolf => true,
+            Role::FortuneTeller => false,
+            Role::LittleGirl => false,
+            Role::Witch => false,
+            Role::Thief => false,
+            Role::Hunter => false,
+            Role::Cupido => false
+        }
+    }
+
+    fn is_fortune_teller(role: @Role) -> bool {
+        match role {
+            Role::Townfolk => false,
+            Role::Werewolf => false,
+            Role::FortuneTeller => true,
+            Role::LittleGirl => false,
+            Role::Witch => false,
+            Role::Thief => false,
+            Role::Hunter => false,
+            Role::Cupido => false
+        }
+    }
+
+    fn is_little_girl(role: @Role) -> bool {
+        match role {
+            Role::Townfolk => false,
+            Role::Werewolf => false,
+            Role::FortuneTeller => false,
+            Role::LittleGirl => true,
+            Role::Witch => false,
+            Role::Thief => false,
+            Role::Hunter => false,
+            Role::Cupido => false
+        }
+    }
+
+    fn is_witch(role: @Role) -> bool {
+        match role {
+            Role::Townfolk => false,
+            Role::Werewolf => false,
+            Role::FortuneTeller => false,
+            Role::LittleGirl => false,
+            Role::Witch => true,
+            Role::Thief => false,
+            Role::Hunter => false,
+            Role::Cupido => false
+        }
+    }
+
+    fn is_thief(role: @Role) -> bool {
+        match role {
+            Role::Townfolk => false,
+            Role::Werewolf => false,
+            Role::FortuneTeller => false,
+            Role::LittleGirl => false,
+            Role::Witch => false,
+            Role::Thief => true,
+            Role::Hunter => false,
+            Role::Cupido => false
+        }
+    }
+
+    fn is_hunter(role: @Role) -> bool {
+        match role {
+            Role::Townfolk => false,
+            Role::Werewolf => false,
+            Role::FortuneTeller => false,
+            Role::LittleGirl => false,
+            Role::Witch => false,
+            Role::Thief => false,
+            Role::Hunter => true,
+            Role::Cupido => false
+        }
+    }
+
+    fn is_cupido(role: @Role) -> bool {
+        match role {
+            Role::Townfolk => false,
+            Role::Werewolf => false,
+            Role::FortuneTeller => false,
+            Role::LittleGirl => false,
+            Role::Witch => false,
+            Role::Thief => false,
+            Role::Hunter => false,
+            Role::Cupido => true
+        }
+    }
 }
+
+// *************************************************************************
+//                           Utility traits
+// *************************************************************************
 
 impl RoleIntoFelt252 of Into<Role, felt252> {
     fn into(self: Role) -> felt252 {
@@ -114,6 +226,10 @@ impl U8IntoRole of Into<u8, Role> {
     }
 }
 
+// *************************************************************************
+//                           Schema Introspections
+// *************************************************************************
+
 impl RoleIntrospectionImpl of SchemaIntrospection<Role> {
     #[inline(always)]
     fn size() -> usize {
@@ -146,4 +262,3 @@ impl RoleIntrospectionImpl of SchemaIntrospection<Role> {
         )
     }
 }
-

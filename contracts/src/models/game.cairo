@@ -64,6 +64,10 @@ impl GameImpl of GameTrait {
     }
 }
 
+// *************************************************************************
+//                           Schema Introspections
+// *************************************************************************
+
 impl DesignedLoversIntrospectionImpl of SchemaIntrospection<(ContractAddress, ContractAddress)> {
     #[inline(always)]
     fn size() -> usize {

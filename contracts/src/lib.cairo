@@ -16,7 +16,7 @@ mod models {
 mod systems {
     mod lobby;
     mod game;
-    mod register;
+    mod profile;
 }
 mod utils {
     mod random;
@@ -37,7 +37,7 @@ mod tests {
     }
     mod systems {
         mod test_lobby;
-        mod test_register;
+        mod test_profile;
     }
     mod test_utils;
 }

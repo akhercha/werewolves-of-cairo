@@ -23,10 +23,6 @@ struct Player {
     actions: PlayerActions
 }
 
-// *************************************************************************
-//                               Model Enums
-// *************************************************************************
-
 #[derive(Copy, Drop, Serde, PartialEq)]
 enum PlayerStatus {
     Alive: (),
