@@ -9,7 +9,9 @@ Recreation of the game Werewolves of Millers Hollow on the Starknet blockchain u
 ```bash
 # start katana local server
 katana --disable-fee
+
 # build & migrate
+cd contracts
 sozo build
 sozo migrate
 
@@ -17,6 +19,7 @@ sozo migrate
 torii --world {world_address}
 
 # setup default auth
+cd ..
 ./scripts/default_auth.sh
 
 # start frontend

@@ -26,6 +26,7 @@ mod lobby {
     use werewolves_of_cairo::models::waiter::{Waiter, WaiterTrait};
     use werewolves_of_cairo::models::player::{Player, PlayerTrait, PlayerStatus};
     use werewolves_of_cairo::entities::role::{Role, RoleTrait};
+    use werewolves_of_cairo::utils::random::shuffle;
     use werewolves_of_cairo::utils::string::assert_valid_string;
     use werewolves_of_cairo::utils::contract_address::assert_address_is_not_zero;
 
@@ -92,7 +93,7 @@ mod lobby {
         fn _create_players_from_lobby(self: @ContractState, lobby: Lobby, game_id: u32) {
             // create & shuffle the roles
             let mut roles: Span<Role> = RoleTrait::composition_for(lobby.num_players);
-            let mut shuffled_roles: Span<Role> = RoleTrait::shuffle(ref roles);
+            let mut shuffled_roles: Span<Role> = shuffle(ref roles);
 
             // traversal indexes
             let mut waiter_index: u32 = 0;

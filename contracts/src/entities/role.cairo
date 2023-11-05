@@ -4,8 +4,7 @@ use dojo::database::schema::{
 };
 
 use werewolves_of_cairo::data::compositions::get_comp_for_num_players;
-use werewolves_of_cairo::entities::randomizer::{Randomizer, RandomizerTrait};
-use werewolves_of_cairo::utils::random::random;
+use werewolves_of_cairo::utils::random::{random, shuffle};
 
 const NBR_OF_ROLES: usize = 8;
 
@@ -52,25 +51,6 @@ impl RoleImpl of RoleTrait {
 
     fn composition_for(nb_players: usize) -> Span<Role> {
         get_comp_for_num_players(nb_players)
-    }
-
-    fn shuffle(ref roles: Span<Role>) -> Span<Role> {
-        let mut randomizer: Randomizer = RandomizerTrait::new();
-        let mut shuffled_roles: Array<Role> = array![];
-        loop {
-            if (roles.len() <= 0) {
-                break;
-            }
-
-            let is_back: bool = randomizer.random(0, 2).into();
-            let item = if is_back {
-                roles.pop_back().unwrap()
-            } else {
-                roles.pop_front().unwrap()
-            };
-            shuffled_roles.append(*item);
-        };
-        shuffled_roles.span()
     }
 
     fn first_night_only() -> Span<Role> {
@@ -167,12 +147,4 @@ impl RoleIntrospectionImpl of SchemaIntrospection<Role> {
     }
 }
 
-// *************************************************************************
-//                               Utilities
-// *************************************************************************
 
-impl U128IntoBool of Into<u128, bool> {
-    fn into(self: u128) -> bool {
-        self > 0
-    }
-}

@@ -13,7 +13,6 @@ fn get_comp_for_num_players(num_players: usize) -> Span<Role> {
     let possible_comps: Array<Span<Role>> = array![
         empty_span,
         empty_span,
-        empty_span,
         three_players_comp(),
         four_players_comp(),
         five_players_comp(),
@@ -26,7 +25,7 @@ fn get_comp_for_num_players(num_players: usize) -> Span<Role> {
         twelve_players_comp(),
     ];
 
-    *possible_comps.at(num_players)
+    *possible_comps.at(num_players - 1)
 }
 
 fn three_players_comp() -> Span<Role> {
