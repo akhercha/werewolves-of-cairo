@@ -20,7 +20,7 @@ enum Role {
     Witch, // 4
     /// Thief:
     ///
-    /// can swap his card with another player once during the game
+    /// can swap his card with another player or become townfolk
     Thief, // 5
     Hunter, // 6
     Cupido, // 7
@@ -53,12 +53,12 @@ impl RoleImpl of RoleTrait {
         get_comp_for_num_players(nb_players)
     }
 
-    fn first_night_only() -> Span<Role> {
-        array![Role::Thief, Role::Cupido,].span()
+    fn play_order_night() -> Span<Role> {
+        array![Role::Werewolf, Role::FortuneTeller, Role::Witch, Role::LittleGirl,].span()
     }
 
-    fn play_order_during_night() -> Span<Role> {
-        array![Role::Werewolf, Role::FortuneTeller, Role::Witch, Role::LittleGirl,].span()
+    fn play_order_specials_first_night() -> Span<Role> {
+        array![Role::Thief, Role::Cupido,].span()
     }
 }
 
@@ -146,5 +146,4 @@ impl RoleIntrospectionImpl of SchemaIntrospection<Role> {
         )
     }
 }
-
 
