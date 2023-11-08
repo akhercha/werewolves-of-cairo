@@ -8,8 +8,8 @@ source = "git+https://github.com/raphaelDkhn/cubit.git#e6331ebf98c5d5f442a0e5ede
 
 [[package]]
 name = "dojo"
-version = "0.3.4"
-source = "git+https://github.com/dojoengine/dojo#d62ec8a522f92d0a0ccf226c6e929bb918b31128"
+version = "0.3.6"
+source = "git+https://github.com/dojoengine/dojo#1526f3088d6dcddf626c207af7b3769e2182c5c0"
 dependencies = [
  "dojo_plugin",
 ]

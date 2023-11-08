@@ -8,7 +8,7 @@ sierra-replace-ids = true
 
 [dependencies]
 cubit = {git = "https://github.com/raphaelDkhn/cubit.git"}
-dojo = { git = "https://github.com/dojoengine/dojo", version = "0.3.4" }
+dojo = { git = "https://github.com/dojoengine/dojo", version = "0.3.6" }
 
 [[target.dojo]]
 
@@ -16,6 +16,14 @@ dojo = { git = "https://github.com/dojoengine/dojo", version = "0.3.4" }
 initializer_class_hash = "0xbeef"
 
 [tool.dojo.env]
+# Local katana
 rpc_url = "http://localhost:5050/"
 account_address = "0x517ececd29116499f4a1b64b094da79ba08dfd54a3edaa316134c41f8160973"
 private_key = "0x1800000000300000180000000000030000000000003006001800006600"
+world_address = "0x789c94ef39aeebc7f8c4c4633030faefb8bee454e358ae53d06ced36136d7d6"
+
+# Slot deployments
+# rpc_url = "https://api.cartridge.gg/x/woc/katana"
+# account_address = "0x2e52d7420edba80572fe0e030d15a4d69194861fbd395747e4e30cfe98c32f5"
+# private_key = "0x2868fe1c7ab009732c37b250b8138d313e51ad4f07638828e24c57b57d9b78f"
+# world_address = "0x1c3c260703e40de3dc8afec8d8416fb8dfb9390a344ea0ae0294055086a31d2"
