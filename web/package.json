@@ -1,48 +1,32 @@
 {
-  "name": "werewolves-of-cairo",
-  "private": true,
-  "version": "0.1.0",
-  "type": "module",
+  "name": "werwolves-of-cairo",
+  "version": "0.0.1",
+  "author": "",
   "scripts": {
     "dev": "vite",
-    "build": "tsc && vite build",
-    "lint": "eslint src --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
+    "build": "vite build",
     "preview": "vite preview",
-    "codegen": "graphql-codegen",
-    "create-components": "npx @dojoengine/core ../dojo-starter/target/dev/manifest.json src/dojo/contractComponents.ts"
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "prettier": {
+    "semi": false,
+    "singleQuote": true,
+    "tabWidth": 2
   },
   "dependencies": {
-    "@dojoengine/core": "^0.1.29",
-    "@dojoengine/create-burner": "^0.1.29",
-    "@dojoengine/utils": "^0.1.29",
-    "@latticexyz/react": "^2.0.0-next.11",
-    "@latticexyz/recs": "^2.0.0-next.11",
-    "@latticexyz/utils": "^2.0.0-next.11",
-    "ethers": "^5.7.2",
-    "graphql": "^16.7.1",
-    "graphql-request": "^6.1.0",
-    "mobx": "^6.9.0",
-    "proxy-deep": "^3.1.1",
-    "react": "^18.2.0",
-    "react-dom": "^18.2.0",
-    "rxjs": "^7.8.1",
-    "starknet": "^5.14.1"
-  },
-  "devDependencies": {
-    "@graphql-codegen/cli": "^5.0.0",
-    "@graphql-codegen/typescript": "^4.0.1",
-    "@graphql-codegen/typescript-graphql-request": "^5.0.0",
-    "@graphql-codegen/typescript-operations": "^4.0.1",
-    "@types/node": "^20.4.8",
-    "@types/react": "^18.0.37",
-    "@types/react-dom": "^18.0.11",
-    "@typescript-eslint/eslint-plugin": "^5.59.0",
-    "@typescript-eslint/parser": "^5.59.0",
-    "@vitejs/plugin-react": "^4.0.0",
-    "eslint": "^8.38.0",
-    "eslint-plugin-react-hooks": "^4.6.0",
-    "eslint-plugin-react-refresh": "^0.3.4",
-    "typescript": "^5.0.2",
-    "vite": "^4.3.9"
+    "@intlify/unplugin-vue-i18n": "^1.5.0",
+    "@vitejs/plugin-vue": "^4.4.1",
+    "@vueuse/core": "^10.5.0",
+    "autoprefixer": "^10.4.16",
+    "postcss": "^8.4.31",
+    "sass": "^1.69.5",
+    "tailwindcss": "^3.3.5",
+    "unplugin-auto-import": "^0.16.7",
+    "vite": "^4.5.0",
+    "vite-svg-loader": "^4.0.0",
+    "vue": "^3.3.8",
+    "vue-i18n": "^9.6.5",
+    "vue-router": "^4.2.5",
+    "vuex": "^4.1.0"
   }
 }
