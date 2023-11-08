@@ -1,11 +1,10 @@
-import { defineConfig } from 'vite'
 import vue from '@vitejs/plugin-vue'
 import vueI18n from '@intlify/unplugin-vue-i18n/vite'
 import SVGLoader from 'vite-svg-loader'
 import AutoImport from 'unplugin-auto-import/vite'
 import path from 'path'
 
-export default defineConfig(() => ({
+export default {
   plugins: [
     vue(),
     vueI18n({
@@ -26,4 +25,4 @@ export default defineConfig(() => ({
   server: {
     port: 8080,
   },
-}))
+}
