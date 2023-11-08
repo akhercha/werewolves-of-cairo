@@ -13,9 +13,9 @@ mod models {
     mod game;
 }
 mod systems {
-    mod lobby;
-    mod game;
-    mod profile;
+    mod lobbies;
+    mod games;
+    mod profiles;
 }
 mod utils {
     mod random;
@@ -35,8 +35,8 @@ mod tests {
         mod test_waiter;
     }
     mod systems {
-        mod test_lobby;
-        mod test_profile;
+        mod test_lobbies;
+        mod test_profiles;
     }
     mod test_utils;
 }

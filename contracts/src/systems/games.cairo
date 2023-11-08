@@ -5,7 +5,7 @@ use starknet::ContractAddress;
 // *************************************************************************
 
 #[starknet::interface]
-trait IGame<TContractState> {
+trait IGames<TContractState> {
     // Create a game from a lobby id
     fn create_game(self: @TContractState, lobby_id: u32) -> (u32, ContractAddress);
 }
@@ -15,7 +15,7 @@ trait IGame<TContractState> {
 // *************************************************************************
 
 #[dojo::contract]
-mod lobby {
+mod games {
     use starknet::ContractAddress;
     use starknet::get_caller_address;
     use starknet::get_block_timestamp;
@@ -30,7 +30,7 @@ mod lobby {
     use werewolves_of_cairo::utils::string::assert_valid_string;
     use werewolves_of_cairo::utils::contract_address::assert_address_is_not_zero;
 
-    use super::IGame;
+    use super::IGames;
 
     #[starknet::interface]
     trait ISystem<TContractState> {
@@ -58,7 +58,7 @@ mod lobby {
     }
 
     #[external(v0)]
-    impl GameImpl of IGame<ContractState> {
+    impl GamesImpl of IGames<ContractState> {
         fn create_game(self: @ContractState, lobby_id: u32) -> (u32, ContractAddress) {
             let caller_address = get_caller_address();
             let lobby = get!(self.world(), lobby_id, Lobby);
@@ -75,6 +75,7 @@ mod lobby {
 
             // create the game if everything went well
             let game = GameTrait::new(game_id, caller_address, start_time, lobby.num_players);
+            set!(self.world(), (game));
 
             // emit game created
             emit!(

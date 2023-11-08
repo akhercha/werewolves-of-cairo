@@ -5,7 +5,7 @@ use starknet::ContractAddress;
 // *************************************************************************
 
 #[starknet::interface]
-trait IProfile<TContractState> {
+trait IProfiles<TContractState> {
     // Register a new profile
     fn register(self: @TContractState, user_name: felt252) -> (ContractAddress, felt252);
 }
@@ -15,14 +15,14 @@ trait IProfile<TContractState> {
 // *************************************************************************
 
 #[dojo::contract]
-mod profile {
+mod profiles {
     use starknet::{ContractAddress, get_caller_address, get_block_timestamp};
     use starknet::info::get_tx_info;
 
     use werewolves_of_cairo::models::profile::{Profile, ProfileTrait};
     use werewolves_of_cairo::utils::string::assert_valid_string;
 
-    use super::IProfile;
+    use super::IProfiles;
 
     #[starknet::interface]
     trait ISystem<TContractState> {
@@ -48,7 +48,7 @@ mod profile {
     }
 
     #[external(v0)]
-    impl LobbyImpl of IProfile<ContractState> {
+    impl IProfilesImpl of IProfiles<ContractState> {
         fn register(self: @ContractState, user_name: felt252) -> (ContractAddress, felt252) {
             let caller: ContractAddress = get_caller_address();
 

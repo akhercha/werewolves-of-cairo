@@ -7,7 +7,7 @@ use werewolves_of_cairo::models::lobby::Lobby;
 // *************************************************************************
 
 #[starknet::interface]
-trait ILobby<TContractState> {
+trait ILobbies<TContractState> {
     // Create a new lobby
     fn create_lobby(self: @TContractState, lobby_name: felt252) -> (u32, ContractAddress);
 
@@ -29,7 +29,7 @@ trait ILobby<TContractState> {
 // *************************************************************************
 
 #[dojo::contract]
-mod lobby {
+mod lobbies {
     use starknet::ContractAddress;
     use starknet::get_caller_address;
     use starknet::get_block_timestamp;
@@ -43,7 +43,7 @@ mod lobby {
     use werewolves_of_cairo::utils::string::assert_valid_string;
     use werewolves_of_cairo::utils::contract_address::assert_address_is_not_zero;
 
-    use super::ILobby;
+    use super::ILobbies;
 
     #[starknet::interface]
     trait ISystem<TContractState> {
@@ -98,7 +98,7 @@ mod lobby {
     }
 
     #[external(v0)]
-    impl LobbyImpl of ILobby<ContractState> {
+    impl LobbiesImpl of ILobbies<ContractState> {
         fn create_lobby(self: @ContractState, lobby_name: felt252) -> (u32, ContractAddress) {
             assert_valid_string(lobby_name);
 
