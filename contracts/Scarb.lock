@@ -2,26 +2,20 @@
 version = 1
 
 [[package]]
-name = "cubit"
-version = "1.2.0"
-source = "git+https://github.com/raphaelDkhn/cubit.git#e6331ebf98c5d5f442a0e5edefe0b367c8e270d9"
-
-[[package]]
 name = "dojo"
-version = "0.3.6"
-source = "git+https://github.com/dojoengine/dojo#1526f3088d6dcddf626c207af7b3769e2182c5c0"
+version = "0.3.7"
+source = "git+https://github.com/dojoengine/dojo#87b46abd194a36a0a1d1098d6fa5058a06f562cd"
 dependencies = [
  "dojo_plugin",
 ]
 
 [[package]]
 name = "dojo_plugin"
-version = "0.3.6"
+version = "0.3.7"
 
 [[package]]
 name = "werewolves_of_cairo"
 version = "0.0.1"
 dependencies = [
- "cubit",
  "dojo",
 ]
