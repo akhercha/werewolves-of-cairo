@@ -14,11 +14,16 @@
     "tabWidth": 2
   },
   "dependencies": {
+    "@dojoengine/core": "^0.1.37",
+    "@dojoengine/create-burner": "^0.1.37",
+    "@dojoengine/utils": "^0.1.37",
     "@intlify/unplugin-vue-i18n": "^1.5.0",
     "@vitejs/plugin-vue": "^4.4.1",
     "@vueuse/core": "^10.5.0",
     "autoprefixer": "^10.4.16",
     "postcss": "^8.4.31",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
     "sass": "^1.69.5",
     "tailwindcss": "^3.3.5",
     "unplugin-auto-import": "^0.16.7",
