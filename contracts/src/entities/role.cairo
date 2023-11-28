@@ -1,6 +1,6 @@
 use starknet::ContractAddress;
-use dojo::database::schema::{
-    Enum, Member, Ty, Struct, SchemaIntrospection, serialize_member, serialize_member_type
+use dojo::database::introspect::{
+    Enum, Member, Ty, Struct, Introspect, serialize_member, serialize_member_type
 };
 
 use werewolves_of_cairo::data::compositions::get_comp_for_num_players;
@@ -230,7 +230,7 @@ impl U8IntoRole of Into<u8, Role> {
 //                           Schema Introspections
 // *************************************************************************
 
-impl RoleIntrospectionImpl of SchemaIntrospection<Role> {
+impl RoleIntrospectionImpl of Introspect<Role> {
     #[inline(always)]
     fn size() -> usize {
         1

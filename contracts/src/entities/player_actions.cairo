@@ -1,6 +1,6 @@
 use starknet::{ContractAddress, contract_address_const};
-use dojo::database::schema::{
-    Enum, Member, Ty, Struct, SchemaIntrospection, serialize_member, serialize_member_type
+use dojo::database::introspect::{
+    Enum, Member, Ty, Struct, Introspect, serialize_member, serialize_member_type
 };
 
 /// In game possible actions for player depending on its role
@@ -74,7 +74,7 @@ impl DefaultPlayerActions of Default<PlayerActions> {
 //                           Schema Introspections
 // *************************************************************************
 
-impl PlayerActionsIntrospectionImpl of SchemaIntrospection<PlayerActions> {
+impl PlayerActionsIntrospectionImpl of Introspect<PlayerActions> {
     #[inline(always)]
     fn size() -> usize {
         1
